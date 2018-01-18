@@ -31,8 +31,8 @@ function start()
 	//	keyPressed
 	var currentlyPressedKeys = {};
 
+	// camera fixe
   var fixed = true;
-
 	// car Position
 	var CARx = -220;
 	var CARy = 0 ;
@@ -55,6 +55,7 @@ function start()
 
 	//	Loading env
 	var Loader = new ThreeLoadingEnv();
+
 
 	//	Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
@@ -98,7 +99,6 @@ function start()
 
   var cameraManagement = new CameraManagement();
 
-  // positions des cameras fixes
 
 
 	//	Planes Set for Navigation
@@ -161,7 +161,7 @@ function start()
 				console.log('object:'+o.name+'>'+o.id+'::'+o.type);
 			});
 		}
-    if (currentlyPressedKeys[80]) {
+    if (currentlyPressedKeys[80]) { // (P) change camera
       fixed = !fixed;
     }
 		if (currentlyPressedKeys[68]) // (D) Right

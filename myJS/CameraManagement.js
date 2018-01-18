@@ -3,7 +3,7 @@
 
 CameraManagement = function(){
 
-
+  var tour = 0;
   this.camerasPositions = [
     {
       camera: new THREE.Vector3(-260, -160, 100),
@@ -76,11 +76,14 @@ CameraManagement = function(){
       renderingEnvironment.camera.up = new THREE.Vector3(0,  0, 1);
       renderingEnvironment.camera.lookAt(new THREE.Vector3(carPosition.position.x, carPosition.position.y, carPosition.position.z));
     } else {
+      // attach the scene camera to car
       carGeometry.add(renderingEnvironment.camera) ;
     	renderingEnvironment.camera.position.x = 0.0 ;
     	renderingEnvironment.camera.position.z = 10.0 ;
     	renderingEnvironment.camera.position.y = -25.0 ;
     	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
+      renderingEnvironment.camera.rotation.y = 0.0 ;
+      renderingEnvironment.camera.rotation.z = 0.0 ;
     }
     return renderingEnvironment.camera
   }
