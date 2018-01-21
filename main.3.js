@@ -196,8 +196,10 @@ function start()
 		requestAnimationFrame( render );
 		handleKeys();
 		// Vehicle stabilization
-		//vehicle.goUp(vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0) ;
-		//vehicle.stopAngularSpeedsXY() ;
+		if(fixed){
+      /*vehicle.goUp(vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0) ;
+  		vehicle.stopAngularSpeedsXY() ;*/
+    }
 		vehicle.stabilizeSkid(50) ;
 		vehicle.stabilizeTurn(1000) ;
 		var oldPosition = vehicle.position.clone() ;
@@ -223,7 +225,7 @@ function start()
 		renderingEnvironment.camera.position.z = NAV.z+50+vehicle.speed.length()*2 ;
 		/*console.log(vehicle.speed.z) ;*/
 
-	
+
 	turnManagement.CheckpointPassed(NAV, carPosition)
 	turnManagement.countTurn(NAV, carPosition)
 	renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
