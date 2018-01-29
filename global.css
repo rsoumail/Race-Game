@@ -1,0 +1,18 @@
+#turncounter {
+  width: 100px;
+  height: 120px;
+  position:absolute;
+  top: 0px;
+  right: 0px;
+}
+
+#speedometer
+{
+   position: absolute;
+   top: 0px;
+   left: 0px;
+   width: 200px;
+   height: 120px;
+   display: inline-block;
+   -webkit-transform: translate3d(0, 0, 0);
+}

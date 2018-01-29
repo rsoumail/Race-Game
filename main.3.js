@@ -12,8 +12,13 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js",
+<<<<<<< c61801fb11cc42f5008784df5320a1ec6621b384
                                   "myJS/CameraManagement.js",
 																"myJS/TurnManagement.js"]) ;
+=======
+                                    "myJS/CameraManagement.js",
+                                    "myJS/SpeedoMeterManagement.js"]) ;
+>>>>>>> Add speedometer, turncounter, helicopter
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -66,6 +71,23 @@ function start()
 	//Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
+
+/*  var div = document.createElement('div');
+  document.body.appendChild(div)
+  div.id = 'chart_div';
+  div.style="width: 400px; height: 120px";*/
+// create the object3d for this element
+// var cssObject = new THREE.Object3D( element );
+// // we reference the same position and rotation
+// cssObject.position.x = -220
+// cssObject.position.y = 0
+// cssObject.position.z = -100
+//cssObject.rotation = planeMesh.rotation;
+// add it to the css scene
+//cssScene.add(cssObject);
+// console.log('test ' + cssObject.position.x)
+// renderingEnvironment.addToScene(cssObject);
+
 	//	Car
 	// car Translation
 	var carPosition = new THREE.Object3D();
@@ -100,6 +122,7 @@ function start()
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
 
   var cameraManagement = new CameraManagement();
+  var speedoMeterManagement =new SpeedoMeterManagement();
 
 	var turnManagement = new TurnManagement();
 
@@ -226,9 +249,13 @@ function start()
 		/*console.log(vehicle.speed.z) ;*/
 
 
+
 	turnManagement.CheckpointPassed(NAV, carPosition)
 	turnManagement.countTurn(NAV, carPosition)
 	renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
+
+    speedoMeterManagement.updateSpeedometer(vehicle.speed)
+
 
 }
 
