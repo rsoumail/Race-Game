@@ -84,7 +84,7 @@ CameraManagement = function(){
     	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
       renderingEnvironment.camera.rotation.y = 0.0 ;
       renderingEnvironment.camera.rotation.z = 0.0 ;
-    }
+      }
     return renderingEnvironment.camera
   }
 }

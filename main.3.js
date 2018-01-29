@@ -12,7 +12,8 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js",
-                                  "myJS/CameraManagement.js"]) ;
+                                  "myJS/CameraManagement.js",
+																"myJS/TurnManagement.js"]) ;
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -33,6 +34,7 @@ function start()
 
 	// camera fixe
   var fixed = true;
+
 	// car Position
 	var CARx = -220;
 	var CARy = 0 ;
@@ -98,6 +100,8 @@ function start()
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
 
   var cameraManagement = new CameraManagement();
+
+	var turnManagement = new TurnManagement();
 
 
 
@@ -219,11 +223,13 @@ function start()
 		renderingEnvironment.camera.position.z = NAV.z+50+vehicle.speed.length()*2 ;
 		/*console.log(vehicle.speed.z) ;*/
 
+	
+	turnManagement.CheckpointPassed(NAV, carPosition)
+	turnManagement.countTurn(NAV, carPosition)
+	renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
 
-
-  renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
-
-};
+}
 
 	render();
+
 }

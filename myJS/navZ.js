@@ -30,7 +30,7 @@ navPlane = function(nname,xxmin, xxmax,yymin,yymax,zzmin,zzmax,aaxis){
 	}
 	else{
 		this.xmin = xxmax ;
-		this.xmax = xxmin ;	
+		this.xmax = xxmin ;
 	}
 	if (yymin<=yymax){
 		this.ymin = yymin;
@@ -125,25 +125,25 @@ navPlane = function(nname,xxmin, xxmax,yymin,yymax,zzmin,zzmax,aaxis){
 		var deltaz = this.zmax-this.zmin ;
 		// switch according to axis
 		switch(this.axis){
-			case 'px': 
-				i.set(deltax,0.0,+deltaz) ; 
-				j.set(0.0,1.0,0.0) ; 
-				k.set(-deltaz,0.0,deltax) ; 
+			case 'px':
+				i.set(deltax,0.0,+deltaz) ;
+				j.set(0.0,1.0,0.0) ;
+				k.set(-deltaz,0.0,deltax) ;
 			break ;
 			case 'nx':
-				i.set(deltax,0.0,-deltaz) ; 
-				j.set(0.0,1.0,0.0) ; 
-				k.set(+deltaz,0.0,deltax) ; 
+				i.set(deltax,0.0,-deltaz) ;
+				j.set(0.0,1.0,0.0) ;
+				k.set(+deltaz,0.0,deltax) ;
 			break ;
 			case 'py':
-				i.set(1.0,0.0,0.0) ; 
-				j.set(0.0,deltay,+deltaz) ; 
-				k.set(0.0,-deltaz,deltay) ; 
+				i.set(1.0,0.0,0.0) ;
+				j.set(0.0,deltay,+deltaz) ;
+				k.set(0.0,-deltaz,deltay) ;
 			break ;
-			case 'ny':  
-				i.set(1.0,0.0,0.0) ; 
-				j.set(0.0,deltay,-deltaz) ; 
-				k.set(0.0,+deltaz,deltay) ; 
+			case 'ny':
+				i.set(1.0,0.0,0.0) ;
+				j.set(0.0,deltay,-deltaz) ;
+				k.set(0.0,+deltaz,deltay) ;
 			break ;
 		}
 		// normalize i,j,k
@@ -178,7 +178,7 @@ navPlane = function(nname,xxmin, xxmax,yymin,yymax,zzmin,zzmax,aaxis){
 		var rotx = 0.0 ; var roty = 0.0 ;
 		// compute the lengths of the box
 		switch(this.axis){
-			case 'px': 
+			case 'px':
 				// box lengths
 				lx = Math.sqrt((this.xmax-this.xmin)*(this.xmax-this.xmin)+(this.zmax-this.zmin)*(this.zmax-this.zmin));
 				ly = this.ymax-this.ymin ;
@@ -199,21 +199,21 @@ navPlane = function(nname,xxmin, xxmax,yymin,yymax,zzmin,zzmax,aaxis){
 				// rotation : along x
 				rotx = + Math.atan2((this.zmax-this.zmin),(this.ymax-this.ymin));
 			break ;
-			case 'ny': 
+			case 'ny':
 				//  box lengths
 				var lx = this.xmax-this.xmin ;
 				var ly = Math.sqrt((this.ymax-this.ymin)*(this.ymax-this.ymin)+(this.zmax-this.zmin)*(this.zmax-this.zmin));
 				// rotation : along x
 				rotx = - Math.atan2((this.zmax-this.zmin),(this.ymax-this.ymin));
 			break ;
-		}		
-		var geometry = new THREE.BoxGeometry(lx,ly,01); 
-		var material = new THREE.MeshLambertMaterial( {color: 0x404080} ); 
+		}
+		var geometry = new THREE.BoxGeometry(lx,ly,01);
+		var material = new THREE.MeshLambertMaterial( {color: 0x404080} );
 		var plane = new THREE.Mesh( geometry, material );
 		plane.name = this.name +'GEO';
 		// translation
-		plane.position.x = this.xmin + (this.xmax-this.xmin)/2.0; 
-		plane.position.y = this.ymin + (this.ymax-this.ymin)/2.0; 
+		plane.position.x = this.xmin + (this.xmax-this.xmin)/2.0;
+		plane.position.y = this.ymin + (this.ymax-this.ymin)/2.0;
 		plane.position.z = this.zmin + (this.zmax-this.zmin)/2.0;
 		// rotation
 		plane.rotation.x = rotx ;
@@ -259,7 +259,7 @@ navPlaneSet = function(p){
 	// array of ANavPlane
 	this.planeSet = [];
 	// must have one plane
-	this.planeSet.push(p);	
+	this.planeSet.push(p);
 	// active plane
 	this.active = -1;
 	// position x,y
@@ -287,7 +287,7 @@ navPlaneSet = function(p){
 	this.findActive = function (x,y){
 		var act = -1;
 		for (var i in this.planeSet){
-			if((this.planeSet[i].isIn(x,y))){act =i; break;}			
+			if((this.planeSet[i].isIn(x,y))){act =i; break;}
 		}
 		//if (act == -1){console.log('out of the world !!!')}
 		return act ;
@@ -333,7 +333,7 @@ navPlaneSet = function(p){
 			}
 			else {
 				// move to another plane
-				//console.log('NAV.move'+'::'+'try to enter plane '+this.planeSet[new_act].name);				
+				//console.log('NAV.move'+'::'+'try to enter plane '+this.planeSet[new_act].name);
 				// compute dz: jump or fall
 				// current z
 				var cz = this.planeSet[this.active].z(this.x,this.y);
@@ -341,7 +341,7 @@ navPlaneSet = function(p){
 				var tz = this.planeSet[new_act].z(this.x+dx,this.y+dy);
 				// delta z
 				var dz = tz -cz ;
-				//console.log('NAV.move'+'::'+'jump to enter : '+dz +' limit:'+-ndzmax+' , '+pdzmax);				
+				//console.log('NAV.move'+'::'+'jump to enter : '+dz +' limit:'+-ndzmax+' , '+pdzmax);
 
 				if ((-ndzmax<dz)&&(dz<pdzmax)){
 					// can jump or fall
@@ -354,7 +354,7 @@ navPlaneSet = function(p){
 					// stay in
 					var ddx = this.planeSet[this.active].stayInX(this.x, this.y,dx,dy);
 					var ddy = this.planeSet[this.active].stayInY(this.x, this.y,dx,dy);
-					this.x += ddx; this.y += ddy;					
+					this.x += ddx; this.y += ddy;
 				}
 			}
 		}
@@ -373,7 +373,7 @@ navPlaneSet = function(p){
 	}
 	//------------------------------------------------------
 	// toMesh
-	// create a mesh 
+	// create a mesh
 	// output
 	//------------------------
 	// Object3D
