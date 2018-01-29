@@ -12,13 +12,10 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js",
-<<<<<<< c61801fb11cc42f5008784df5320a1ec6621b384
                                   "myJS/CameraManagement.js",
-																"myJS/TurnManagement.js"]) ;
-=======
-                                    "myJS/CameraManagement.js",
-                                    "myJS/SpeedoMeterManagement.js"]) ;
->>>>>>> Add speedometer, turncounter, helicopter
+																"myJS/TurnManagement.js",
+                                "myJS/SpeedoMeterManagement.js"]) ;
+
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -250,12 +247,10 @@ function start()
 
 
 
+  speedoMeterManagement.updateSpeedometer(vehicle.speed)
 	turnManagement.CheckpointPassed(NAV, carPosition)
 	turnManagement.countTurn(NAV, carPosition)
 	renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
-
-    speedoMeterManagement.updateSpeedometer(vehicle.speed)
-
 
 }
 

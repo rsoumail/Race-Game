@@ -30,19 +30,12 @@ SpeedoMeterManagement = function(){
     defaults: this.dflt
   });
 
-  this.speedoMeter1 = new JustGage({
-    id: 'turncounter',
-    value: 0,
-    title: '',
-    defaults: this.dflt
-  });
+
 
   console.log("Speed " + this.speedoMeter.config.value)
   var i = 0;
 
   this.updateSpeedometer = function(speed){
-    console.log("Speed " + speed.length())
-    console.log("Speed " + this.speedoMeter.config.value)
     i++
     this.speedoMeter.refresh(i)
   }
