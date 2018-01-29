@@ -13,6 +13,8 @@
    left: 0px;
    width: 200px;
    height: 120px;
-   display: inline-block;
-   -webkit-transform: translate3d(0, 0, 0);
+}
+
+#speedometer text:nth-child(6) tspan{
+  font-size: 0.8em !important;
 }

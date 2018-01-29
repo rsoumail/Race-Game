@@ -5,10 +5,10 @@ SpeedoMeterManagement = function(){
   this.dflt = {
     min: 0,
     max: 220,
-    symbol: ' Km/h',
+    label: "Km/h",
     pointer: true,
     donut: false,
-    gaugeWidthScale: 0.6,
+    gaugeWidthScale: 1.5,
     counter: true,
     hideInnerShadow: true,
     shadowSize: 5,
