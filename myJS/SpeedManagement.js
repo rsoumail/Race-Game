@@ -8,7 +8,7 @@ SpeedManagement = function() {
   this.currentPosition = new THREE.Vector3();
   this.dflt = {
     min: 0,
-    max: 150,
+    max: 120,
     label: "Km/h",
     pointer: true,
     donut: false,
@@ -22,8 +22,8 @@ SpeedManagement = function() {
       hi: 60
     }, {
       color: "#ff0000",
-      lo: 120,
-      hi: 150
+      lo: 100,
+      hi: 120
     }]
   }
 
