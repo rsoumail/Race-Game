@@ -10,10 +10,20 @@
 
 	</head>
 	<body>
-    <!--canvas id="div-c" style="width: 400px; height: 120px; position:absolute"></canvas-->
 		<script data-main="main.3.js" src="lib/require.js"></script>
     <div id="speedometer" class="400x160px" ></div>
     <div id="turncounter" class="200x160px"></div>
+    <div id="turntimes">
+      <ul>
+				<li id="lap1"></li>
+        <li id="lap2"></li>
+        <li id="lap3"></li>
+				<li id="elapsedTime"></li>
+			</ul>
+    </div>
+    <div id="wrongDirection">
+      <h1 id ="wrongtext"></h1>
+    </div>
 
 	</body>
 </html>
