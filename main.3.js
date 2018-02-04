@@ -15,6 +15,9 @@ requirejs(['ModulesLoaderV2.js'], function()
                                   "myJS/CameraManagement.js",
 																"myJS/TurnManagement.js",
                                 "myJS/SpeedoMeterManagement.js"]) ;
+			ModulesLoader.requireModules(["ParticleSystem.js",
+																		"Interpolators.js",
+																		"MathExt.js"]);
 
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
@@ -69,6 +72,79 @@ function start()
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
 
+	//Particles
+	//Système de particules
+
+
+	var particlesFeature = new ParticleSystem.Engine_Class({
+		particlesCountMax: 1000,
+		textureFile: "assets/particles/particle.png",
+		blendingMode: THREE.AdditiveBlending
+	});
+
+	var emitterParticlesD = new ParticleSystem.ConeEmitter_Class({
+		cone: {
+				center: new THREE.Vector3(2.7,-8,2),
+				height: new THREE.Vector3(0,-0.5,0),
+				radius: 0.2,
+				flow: 100,
+		},
+		particle: {
+			speed: new MathExt.Interval_Class(10, 20),
+					mass: new MathExt.Interval_Class(0.1, 0.1),
+					size: new MathExt.Interval_Class(0.1, 4),
+					lifeTime: new MathExt.Interval_Class(0.5, 10)
+		}
+	});
+
+	var emitterParticlesG = new ParticleSystem.ConeEmitter_Class({
+		cone: {
+				center: new THREE.Vector3(-2.7,-8,2),
+				height: new THREE.Vector3(0,-0.5,0),
+				radius: 0.2,
+				flow: 100,
+		},
+		particle: {
+			speed: new MathExt.Interval_Class(10, 20),
+					mass: new MathExt.Interval_Class(0.1, 0.1),
+					size: new MathExt.Interval_Class(0.1, 4),
+					lifeTime: new MathExt.Interval_Class(0.5, 10)
+		}
+	});
+
+	//var emitterParticles = new ParticleSystem.ConeEmitter_Class(particlesEmitterG);
+
+	particlesFeature.addEmitter(emitterParticlesD);
+	particlesFeature.addEmitter(emitterParticlesG);
+
+	particlesFeature.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+
+	particlesFeature.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+
+	particlesFeature.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
+
+	var linearInterpolator = new Interpolators.Linear_Class(0.7,0.9);
+	particlesFeature.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(linearInterpolator));
+/*
+	particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(
+         {r:0.5,g:0,b:0},{r:0,g:0,b:0.5}
+   ));*/
+	 var white = { r: 1, g: 1, b: 1 };
+	var lightGrey = { r: 0.9, g: 0.9, b: 0.8 };
+	var blue = { r: 0, g: 0, b: 1 };
+	var red = { r: 0.7, g: 0, b: 0 }
+	particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(red, lightGrey));
+
+	var rotating = new THREE.Object3D();
+	renderingEnvironment.addToScene(rotating);
+	renderingEnvironment.addToScene(particlesFeature.particleSystem);
+
+	var clock = new THREE.Clock(true);
+
+
+	//var linearInterpolator = new Interpolators.Linear_Class(1, 0);
+	//particlesFeature.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(linearInterpolator));
+
 /*  var div = document.createElement('div');
   document.body.appendChild(div)
   div.id = 'chart_div';
@@ -107,13 +183,15 @@ function start()
 	// simple method to load an object
 	var carGeometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: carRotationZ, name: 'car3'}) ;
 
-	carGeometry.position.z= +0.25 ;
+	carGeometry.position.z= +2 ;
 	// attach the scene camera to car
   //carGeometry.add(renderingEnvironment.camera) ;
 	/*renderingEnvironment.camera.position.x = 0.0 ;
 	renderingEnvironment.camera.position.z = 10.0 ;
 	renderingEnvironment.camera.position.y = -25.0 ;
 	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;*/
+
+	carGeometry.add(particlesFeature.particleSystem);
 
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
@@ -212,6 +290,7 @@ function start()
 		renderingEnvironment.onWindowResize(window.innerWidth,window.innerHeight);
 	}
 
+
 	function render() {
 		requestAnimationFrame( render );
 		handleKeys();
@@ -246,8 +325,9 @@ function start()
 		/*console.log(vehicle.speed.z) ;*/
 
 
-
-  speedoMeterManagement.updateSpeedometer(vehicle.speed)
+	var deltaTime = clock.getDelta();
+	particlesFeature.animate(deltaTime, renderingEnvironment);
+  //speedoMeterManagement.updateSpeedometer(vehicle.speed)
 	turnManagement.CheckpointPassed(NAV, carPosition)
 	turnManagement.countTurn(NAV, carPosition)
 	renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))

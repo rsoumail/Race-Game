@@ -56,7 +56,7 @@ TurnManagement = function() {
   ]
 
   this.numberOfTurn = 0;
-  var turnMax = 2;
+  var turnMax = 3;
   var lastPlane = {
     passed:'',
     plane:''
@@ -95,12 +95,7 @@ TurnManagement = function() {
    this.countTurn = function(NAV, carPosition){
       if(this.switchTurn() === true && this.passedArrived(NAV, carPosition) === true){
           this.numberOfTurn++
-
           console.log('Turn '  + this.numberOfTurn)
-          if(this.numberOfTurn === turnMax){
-            console.log('FIN')
-
-          }
       this.turnCheckPoints.forEach((c) => {
           c.passed = false
        })
@@ -120,6 +115,6 @@ TurnManagement = function() {
    }
 
    this.updateTurnCounter = function(turn){
-     this.turnCounter.refresh(turn)
+     //this.turnCounter.refresh(turn)
    }
 }

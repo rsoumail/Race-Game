@@ -37,6 +37,6 @@ SpeedoMeterManagement = function(){
 
   this.updateSpeedometer = function(speed){
     i++
-    this.speedoMeter.refresh(i)
+    //this.speedoMeter.refresh(i)
   }
 }

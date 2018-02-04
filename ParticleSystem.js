@@ -1,11 +1,11 @@
 // Tests the existence of ModuleLoader, if not, this file cannot be included
 if(typeof(ModulesLoader)=="undefined")
 {
-	throw "ModulesLoader.js is required to load script ThreeRenderer.js" ; 
+	throw "ModulesLoader.js is required to load script ThreeRenderer.js" ;
 }
 
 // Loads dependencies and initializes this module
-ModulesLoader.requireModules(['lib/three.min.js', 'Physics.js', 'ThreeRenderer.js', 'MathExt.js', 'DebugHelper.js']) ;
+ModulesLoader.requireModules(['threejs/three.min.js', 'Physics.js', 'myJS/ThreeRenderingEnv.js', 'MathExt.js', 'DebugHelper.js']) ;
 
 var ParticleSystem = {} ;
 
@@ -26,53 +26,53 @@ ParticleSystem.PhysicsParticle_Class = function(position, speed, mass, size, lif
 	 * Speed of the particle
 	 */
 	this.speed = speed.clone() ;
-	
+
 	/**
 	 *  Force applied on the particle
 	 */
 	this.force = new THREE.Vector3(0.0,0.0,0.0) ;
-	
+
 	/**
 	 *  Color of the particle
 	 */
 	this.color = new THREE.Color() ;
 	this.color.setRGB(1.0,1.0,1.0) ;
-	
+
 	/**
 	 *  Opacity of the particle
 	 */
 	this.opacity = 0.1 ;
-	
-	/** 
+
+	/**
 	 *  1.0 : particle is rendered, 0.0 : particle is not rendered
 	 */
 	this.alive = 1.0 ;
-	
+
 	/**
 	 *  Size of the particle
 	 */
 	this.size = size ;
-	
+
 	/**
 	 *  Angle of the particle
 	 */
 	this.angle = 0.0 ;
-	
+
 	/**
 	 * Life time (in seconds) of the particle
 	 */
-	this.lifeTime = lifeTime ; 
-	
+	this.lifeTime = lifeTime ;
+
 	/**
 	 * Current life time
 	 */
 	this.currentLifeTime = 0.0 ;
-	
-	/** 
+
+	/**
 	 * Mass of the particle
 	 */
-	this.mass = mass ;		
-	
+	this.mass = mass ;
+
 	/**
 	 * Force associated to weight (on earth)
 	 */
@@ -80,7 +80,7 @@ ParticleSystem.PhysicsParticle_Class = function(position, speed, mass, size, lif
 	{
 		return new THREE.Vector3(0.0,0.0,-this.mass * Physics.G)   ;
 	} ;
-	
+
 	/**
 	 *  Resets the force vector
 	 */
@@ -90,7 +90,7 @@ ParticleSystem.PhysicsParticle_Class = function(position, speed, mass, size, lif
 		this.force.y = 0 ;
 		this.force.z = 0 ;
 	} ;
-	
+
 	/**
 	 * Call this function to know if the particle is dead or not.
 	 */
@@ -109,7 +109,7 @@ ParticleSystem.PhysicsParticle_Class = function(position, speed, mass, size, lif
 {
 	// Description of the emitter shape
 	cone: {
-		center: {THREE.Vector3} Cone center 
+		center: {THREE.Vector3} Cone center
 		height: {THREE.Vector3} Cone height vector
 		radius: {Scalar} Radius of the top of the cone
 		flow: 	{Scalar} Number of particles emitted per second
@@ -119,9 +119,9 @@ ParticleSystem.PhysicsParticle_Class = function(position, speed, mass, size, lif
 		speed: 	  {MathExt.Interval_Class} Particle speed
 		mass: 	  {MathExt.Interval_Class} Particle mass
 		size:	  {MathExt.Interval_Class} Particle size
-		lifeTime: {MathExt.Interval_Class} Particle lifetime 
+		lifeTime: {MathExt.Interval_Class} Particle lifetime
 	}
-} 
+}
 */
 ParticleSystem.ConeEmitter_Class = function(configuration)
 	//function(centerPosition, emissionDirection, radius, flow, speedInterval, massInterval, sizeInterval, lifeTimeInterval)
@@ -141,7 +141,7 @@ ParticleSystem.ConeEmitter_Class = function(configuration)
 		MathExt.Interval_Class_Requirements(configuration.particle.size) &&
 		DebugHelper.requireAttribute(configuration.particle, 'lifeTime') &&
 		MathExt.Interval_Class_Requirements(configuration.particle.lifeTime) ;
-	
+
 	/**
 	 *  Emission direction
 	 */
@@ -164,7 +164,7 @@ ParticleSystem.ConeEmitter_Class = function(configuration)
 	 */
 	this.lifeTimeInterval = configuration.particle.lifeTime ;
 //	this.lifeTimeInterval = lifeTimeInterval ;
-	
+
 	/**
 	 *  Radius of the circle used to compute real emission direction
 	 */
@@ -202,10 +202,10 @@ ParticleSystem.ConeEmitter_Class = function(configuration)
 	 *  Number of particles emitted since the creation of this emitter
 	 */
 	this.emitted = 0 ;
-	
+
 	/**
 	 *  Instanciate a particle
-	 *  
+	 *
 	 *  @param position The initial particle position
 	 *  @param speed The initial particle speed
 	 *  @param mass Mass of the particle
@@ -215,7 +215,7 @@ ParticleSystem.ConeEmitter_Class = function(configuration)
 	{
 		return new ParticleSystem.PhysicsParticle_Class(position, speed, mass, size, lifeTime) ;
 	} ;
-	
+
 	/**
 	 * @return {position, speed} in which position and speed are instances of THREE.Vector3
 	 */
@@ -235,7 +235,7 @@ ParticleSystem.ConeEmitter_Class = function(configuration)
 	} ;
 
 	/** Given the particle flow, creates necessary particles.
-	 * 
+	 *
 	 * @param dt Time elapsed since last call
 	 * @return An array of emitted particles. Each particle is a structure {position, speed}
 	 */
@@ -278,7 +278,7 @@ ParticleSystem.PositionModifier_EulerItegration_Class = function()
 	{
 		var result = Physics.eulerIntegration(particle.mass, dt, particle.position, particle.speed, particle.force) ;
 		particle.position = result.position ;
-		particle.speed = result.speed ;		
+		particle.speed = result.speed ;
 	} ;
 } ;
 
@@ -289,7 +289,7 @@ ParticleSystem.PositionModifier_PlaneLimit_Class = function(point, normal)
 {
 	this.plane = new THREE.Plane() ;
 	this.plane.setFromNormalAndCoplanarPoint(normal, point) ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		distance = this.plane.distanceToPoint(particle.position) ;
@@ -311,7 +311,7 @@ ParticleSystem.PositionModifier_PlaneBounce_Class = function(point, normal, atte
 	this.attenuation = attenuation ;
 	this.normal.normalize() ;
 	this.plane.setFromNormalAndCoplanarPoint(normal, point) ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		distance = this.plane.distanceToPoint(particle.position) ;
@@ -332,7 +332,7 @@ ParticleSystem.PositionModifier_PlaneBounce_Class = function(point, normal, atte
 } ;
 
 /** Resets forces associated to particles
- * 
+ *
  * @returns {ForceModifier_ResetForce_Class}
  */
 ParticleSystem.ForceModifier_ResetForce_Class = function()
@@ -344,9 +344,9 @@ ParticleSystem.ForceModifier_ResetForce_Class = function()
 } ;
 
 /** An attractor class generating forces attracting particles toward a point.
- * 
+ *
  * @param center The center of the attractor
- * @param extent The spatial extent of the attractor (particles farther from this distance will not be impacted by the attractor) 
+ * @param extent The spatial extent of the attractor (particles farther from this distance will not be impacted by the attractor)
  * @param strength The force strength
  * @returns {Attractor_Class}
  */
@@ -355,10 +355,10 @@ ParticleSystem.ForceModifier_Attractor_Class = function(center, extent, strength
 	this.center = center ;
 	this.extent = extent ;
 	this.strength = strength ;
-	
+
 	this.apply = function(particle, dt)
 	{
-		var distance = center.distanceTo(particle.position) ; 
+		var distance = center.distanceTo(particle.position) ;
 		if(distance<=extent)
 		{
 			var force = MathExt.subVectors(center, particle.position) ;
@@ -370,9 +370,9 @@ ParticleSystem.ForceModifier_Attractor_Class = function(center, extent, strength
 } ;
 
 /** An attractor class generating forces attracting particles toward a segment.
- * 
+ *
  * @param segment {THREE.Line3} The segment of the attractor
- * @param extent The spatial extent of the attractor (particles farther from this distance will not be impacted by the attractor) 
+ * @param extent The spatial extent of the attractor (particles farther from this distance will not be impacted by the attractor)
  * @param strength The force strength
  * @returns {Attractor_Class}
  */
@@ -381,11 +381,11 @@ ParticleSystem.ForceModifier_AttractorSegment_Class = function(segment, extent, 
 	this.segment = segment ;
 	this.extent = extent ;
 	this.strength = strength ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		var center = segment.closestPointToPoint(particle.position) ;
-		var distance = center.distanceTo(particle.position) ; 
+		var distance = center.distanceTo(particle.position) ;
 		if(distance<=extent)
 		{
 			var force = MathExt.subVectors(center, particle.position) ;
@@ -397,9 +397,9 @@ ParticleSystem.ForceModifier_AttractorSegment_Class = function(segment, extent, 
 } ;
 
 /** A repeller class repelling particles from a point
- * 
+ *
  * @param center The center of the repeller
- * @param extent The spatial extent of the repeller (particles farther from this distance will not be impacted by the repeller) 
+ * @param extent The spatial extent of the repeller (particles farther from this distance will not be impacted by the repeller)
  * @param strength The force strength
  */
 ParticleSystem.ForceModifier_Repeller_Class = function(center, extent, strength)
@@ -408,9 +408,9 @@ ParticleSystem.ForceModifier_Repeller_Class = function(center, extent, strength)
 } ;
 
 /** A repeller class repelling particles from a segment
- * 
+ *
  * @param segment The segment of the repeller
- * @param extent The spatial extent of the repeller (particles farther from this distance will not be impacted by the repeller) 
+ * @param extent The spatial extent of the repeller (particles farther from this distance will not be impacted by the repeller)
  * @param strength The force strength
  */
 ParticleSystem.ForceModifier_RepellerSegment_Class = function(segment, extent, strength)
@@ -419,7 +419,7 @@ ParticleSystem.ForceModifier_RepellerSegment_Class = function(segment, extent, s
 } ;
 
 /** A weight force class
- * 
+ *
  * @returns {ForceModifier_Weight_Class}
  */
 ParticleSystem.ForceModifier_Weight_Class = function()
@@ -432,15 +432,15 @@ ParticleSystem.ForceModifier_Weight_Class = function()
 
 /** Sets the particle opacity based on the ratio of its lifetime
  *
- * @param interpolator {Interpolator_xxx_Class} An opacity interpolator 
- *  
+ * @param interpolator {Interpolator_xxx_Class} An opacity interpolator
+ *
  * @returns {OpactyModifier_TimeToDeath_Class}
  */
 ParticleSystem.OpacityModifier_TimeToDeath_Class = function(interpolator)
 {
 	Interpolators.Class_Requirements(interpolator) ;
 	this.interpolator = interpolator ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		var ratio = particle.currentLifeTime/particle.lifeTime ;
@@ -449,7 +449,7 @@ ParticleSystem.OpacityModifier_TimeToDeath_Class = function(interpolator)
 } ;
 
 /** Sets the particle size given its life time ratio, an initial size and a final size
- * 
+ *
  * @param interpolator {Interpolators.XXX_Class} A size interpolator
  * @returns {SizeModifier_TimeToDeath_Class}
  */
@@ -457,7 +457,7 @@ ParticleSystem.SizeModifier_TimeToDeath_Class = function(interpolator)
 {
 	Interpolators.Class_Requirements(interpolator) ;
 	this.interpolato = interpolator ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		var ratio = particle.currentLifeTime/particle.lifeTime ;
@@ -467,16 +467,16 @@ ParticleSystem.SizeModifier_TimeToDeath_Class = function(interpolator)
 
 /** Sets the particle size given its life time ratio, and factors applied on the
  *  initial size of the particle.
- * 
- * @param startFactor Factor applied on the initial size of the particle in order to compute the current size 
+ *
+ * @param startFactor Factor applied on the initial size of the particle in order to compute the current size
  * @param endFactor Factor applied on the initial size of the particle in order to compute the current size.
  * @returns {SizeModifier_TimeToDeath_Class}
  */
-ParticleSystem.SizeModifier_TimeToDeathFactor_Class = function(interpolator) 
+ParticleSystem.SizeModifier_TimeToDeathFactor_Class = function(interpolator)
 {
 	Interpolators.Class_Requirements(interpolator) ;
 	this.interpolator = interpolator ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		if(!particle.hasOwnProperty('__initialSize'))
@@ -489,7 +489,7 @@ ParticleSystem.SizeModifier_TimeToDeathFactor_Class = function(interpolator)
 } ;
 
 /** Sets the color of the particle given its life time ratio
- * 
+ *
  * @param startColor
  * @param endColor
  * @returns {ColorModifier_TimeToDeath_Class}
@@ -498,7 +498,7 @@ ParticleSystem.ColorModifier_TimeToDeath_Class = function(startColor, endColor)
 {
 	this.startColor = startColor ;
 	this.endColor = endColor ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		var ratio = particle.currentLifeTime/particle.lifeTime ;
@@ -508,14 +508,14 @@ ParticleSystem.ColorModifier_TimeToDeath_Class = function(startColor, endColor)
 	} ;
 } ;
 
-/** A constant speed field generating a steering force 
- * 
+/** A constant speed field generating a steering force
+ *
  */
 ParticleSystem.ForceModifier_SteeringUniformSpeed_Class = function(speedVector, maxForce)
 {
 	this.speedVector = speedVector ;
 	this.maxForce = maxForce ;
-	
+
 	this.apply = function(particle, dt)
 	{
 		var steeringForce = MathExt.subVectors(speedVector, particle.speed) ;
@@ -530,9 +530,9 @@ ParticleSystem.ForceModifier_SteeringUniformSpeed_Class = function(speedVector, 
 
 /** Construction of a particle system instance. This class is an animator
  *  compatible with the ThreeRenderer class and is an animator .
- * 
+ *
  *  configuration: data structure containing the following attributes
- *  	- particlesCount : maximum number of particles 
+ *  	- particlesCount : maximum number of particles
  *  	- textureFile : filename of the texture associated to particle for rendering
  *      - blendingMode : THREE blending mode (THREE.AdditiveBlending, THREE.NormalBlending...)
  *  For rendering, the attribute 'particleSystem' must be added in the THREEJS scene graph
@@ -541,7 +541,7 @@ ParticleSystem.ForceModifier_SteeringUniformSpeed_Class = function(speedVector, 
  */
 ParticleSystem.Engine_Class = function(configuration)
 {
-	// Creates the configuration and adds default values to the configuration is needed 
+	// Creates the configuration and adds default values to the configuration is needed
 	if(!configuration)
 	{
 		configuration = {} ;
@@ -561,11 +561,11 @@ ParticleSystem.Engine_Class = function(configuration)
 		console.warn('ParticleSystem_Class: added blendingMode attribute, set to THREE.AdditiveBlending') ;
 		configuration.blendingMode = THREE.AdditiveBlending ;
 	}
-	
+
 	/////////////
 	//SHADERS //
 	/////////////
-	
+
 	//attribute: data that may be different for each particle (such as size and color);
 	//can only be used in vertex shader
 	//varying: used to communicate data from vertex shader to fragment shader
@@ -591,7 +591,7 @@ ParticleSystem.Engine_Class = function(configuration)
 				"gl_Position = projectionMatrix * mvPosition;",
 			"}"
 	].join("\n");
-	
+
 	particleFragmentShader =
 		[
 			"uniform sampler2D texture;",
@@ -607,37 +607,37 @@ ParticleSystem.Engine_Class = function(configuration)
 				"vec4 rotatedTexture = texture2D( texture, rotatedUV );",
 				"gl_FragColor = gl_FragColor * rotatedTexture;", // sets an otherwise white particle texture to desired color
 			"}"
-	].join("\n");	
-	
+	].join("\n");
+
 	////////////////////////////////////////
 	// Attributes of ParticleSystem_Class //
 	////////////////////////////////////////
-	
+
 	/**
 	 * Number of particles
 	 */
 	this.particlesCount = configuration.particlesCount ;
-	
+
 	/**
 	 * Geometry associated to the particle system
 	 */
 	this.particlesGeometry = new THREE.Geometry() ;
-	
+
 	/**
 	 *  Vertex array associated to particles
 	 */
 	this.particlesVertices = this.particlesGeometry.vertices ;
-	
+
 	/**
 	 *  Texture file associated to particles
 	 */
 	this.particleTextureFile = configuration.textureFile ;
-	
+
 	/**
 	 *  Blending mode used during rendering
 	 */
 	this.blendingMode = configuration.blendingMode ;
-	
+
 	/**
 	 * Material associated to the particle system
 	 */
@@ -645,10 +645,10 @@ ParticleSystem.Engine_Class = function(configuration)
 			{
 				uniforms:
 				{
-					texture: { type: "t", 
-							   value: THREE.ImageUtils.loadTexture( this.particleTextureFile, undefined, 
-									   								function(){}, 
-									   								function() { console.error('ParticleSystem_Class: could not load texture '+this.particleTextureFile) ; } ) 
+					texture: { type: "t",
+							   value: THREE.ImageUtils.loadTexture( this.particleTextureFile, undefined,
+									   								function(){},
+									   								function() { console.error('ParticleSystem_Class: could not load texture '+this.particleTextureFile) ; } )
 							 }
 				},
 				attributes:
@@ -661,15 +661,15 @@ ParticleSystem.Engine_Class = function(configuration)
 				},
 				vertexShader: particleVertexShader,
 				fragmentShader: particleFragmentShader,
-				transparent: true, 
+				transparent: true,
 				//alphaTest: 0.5, // if having transparency issues, try including: alphaTest: 0.5,
 				blending: this.blendingMode,
-//				blending: THREE.AdditiveBlending, 
-//				blending: THREE.NormalBlending, 
+//				blending: THREE.AdditiveBlending,
+//				blending: THREE.NormalBlending,
 				depthTest: true
 			}
 	);
-	
+
 	// Initializes the particle system by adding vertices with (0.0,0.0,0.0) coordinates;
 	for(cpt=0 ; cpt<this.particlesCount ; cpt++)
 	{
@@ -680,22 +680,22 @@ ParticleSystem.Engine_Class = function(configuration)
 		this.particlesMaterial.attributes.customSize.value[cpt] = 1.0 ;
 		this.particlesMaterial.attributes.customAngle.value[cpt] = 0.0 ;
 	}
-	
+
 	/**
 	 *   The particle emitters
 	 */
 	this.emitters = [] ;
-	
+
 	/**
 	 *   Alive particles
 	 */
 	this.particles = [] ;
-	
+
 	/**
 	 * 	Force modifiers applied on particles. The default behaviour is to reset forces applied on particles.
 	 */
 	this.modifiers = [new ParticleSystem.ForceModifier_ResetForce_Class()] ;
-	
+
 	/**
 	 * Instance of THREEJS particle system
 	 */
@@ -706,7 +706,7 @@ ParticleSystem.Engine_Class = function(configuration)
 	/////////////////////
 	// private Methods //
 	/////////////////////
-	
+
 	/**
 	 *  Iterates on particles and call toApply function with the particle provided as a parameter
 	 */
@@ -716,8 +716,8 @@ ParticleSystem.Engine_Class = function(configuration)
 		{
 			forceModifier.apply(this.particles[cpt], dt) ;
 		}
-	} ;	
-	
+	} ;
+
 	/**
 	 *  Applies all forces on the referenced particles
 	 */
@@ -728,10 +728,10 @@ ParticleSystem.Engine_Class = function(configuration)
 			this.iterateParticles(this.modifiers[cpt], dt) ;
 		}
 	} ;
-	
+
 	/**
 	 *  Handles life an death of the the particles
-	 *  
+	 *
 	 *  @param dt Time elpased since last call
 	 */
 	this.lifeAndDeath = function(dt)
@@ -765,7 +765,7 @@ ParticleSystem.Engine_Class = function(configuration)
 		}
 //		console.log('alive particles: '+this.particles.length+', removed: '+removed+', added: '+added) ;
 	} ;
-	
+
 	/**
 	 *  Updates the buffer associated to rendering
 	 */
@@ -787,18 +787,18 @@ ParticleSystem.Engine_Class = function(configuration)
 			position.y = 0.0 ;
 			position.z = 0.0 ;
 			this.particlesMaterial.attributes.customVisible.value[cpt] = 0.0 ; // We hide the particle
-		}		
+		}
 		this.particlesGeometry.verticesNeedUpdate = true ;
 	} ;
-	
+
 	////////////////////
 	// Public methods //
 	////////////////////
-	
+
 	/**
 	 * Animates the particle system. This animate function is compatible
 	 * with the animators handled by the ThreeRenderer class.
-	 * 
+	 *
 	 * @param dt Time elapsed since last call
 	 * @param threeRenderer The instance of ThreeRenderer_Class calling this method
 	 */
@@ -819,9 +819,9 @@ ParticleSystem.Engine_Class = function(configuration)
 		if(this.particles.length > this.particlesVertices.length)
 		{
 			console.warn('number of alive particles is greater than the number of rendered particles') ;
-		} 
+		}
 	} ;
-	
+
 	/**
 	 *  Adds an emitter in the particle system
 	 *  An emitter must implement method createParticles(dt).
@@ -831,7 +831,7 @@ ParticleSystem.Engine_Class = function(configuration)
 		DebugHelper.requireMethod(emitter, 'createParticles', 'ParticleSystem.Engine.addEmitter, missing method createParticle(dt)') ;
 		this.emitters.push(emitter) ;
 	} ;
-	
+
 	/**
 	 *  Adds a modifier in the particle system
 	 *  A modifier must implement method apply(particle,dt)
