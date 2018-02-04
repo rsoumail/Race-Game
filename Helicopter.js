@@ -470,6 +470,14 @@ function Helicopter(configuration) {
     }
   }
 
+  this.reset = function (){
+    this.position.position.x = configuration.position.x;
+    this.position.position.y = configuration.position.y;
+    this.position.position.z = configuration.position.z;
+    this.position.rotation.z = 0;
+    this.avancement = 0;
+
+  }
   this.createBezier()
 
 

@@ -19,10 +19,10 @@ SpeedManagement = function() {
     customSectors: [{
       color: "#00ff00",
       lo: 0,
-      hi: 50
+      hi: 60
     }, {
       color: "#ff0000",
-      lo: 100,
+      lo: 120,
       hi: 150
     }]
   }
@@ -41,7 +41,6 @@ SpeedManagement = function() {
   }
 
   this.updateSpeed = function(oldPosition, newPosition) {
-
     if (newPosition.x !== oldPosition.x && newPosition.y !== oldPosition.y) {
       var distance = this.getDistance(oldPosition, newPosition)
       if (distance !== 0) {
@@ -59,11 +58,6 @@ SpeedManagement = function() {
     return Math.sqrt(dx * dx + dy * dy /*+ dz * dz*/ );
   }
 
-  this.reset = function (){
-    var speed = 0;
-    var lastSpeed = 0;
-    $updateSpeedoMeter();
-  }
 
   setInterval(function() {
     $updateSpeedoMeter()

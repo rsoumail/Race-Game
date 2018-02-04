@@ -2,41 +2,6 @@ CameraManagement = function() {
 
   this.currentCam = {};
   this.currentCamIndex = 0;
-
-
-  this.cameraOfPlane = {
-    30: 0,
-    1: 0,
-    2: 0,
-    3: 1,
-    4: 1,
-    5: 1,
-    6: 1,
-    7: 2,
-    8: 2,
-    9: 2,
-    10: 2,
-    11: 3,
-    12: 3,
-    13: 3,
-    14: 3,
-    15: 4,
-    16: 4,
-    17: 4,
-    18: 4,
-    19: 4,
-    20: 5,
-    21: 5,
-    22: 5,
-    23: 5,
-    24: 5,
-    25: 6,
-    26: 6,
-    27: 6,
-    28: 6,
-    29: 6
-  };
-
   this.camerasPositions = [{
       camera: new THREE.Vector3(-260, -160, 100),
       positions: ['p01', 'p02', 'p03']
@@ -108,8 +73,17 @@ CameraManagement = function() {
     fix: {
       render: function(arg) {
         var active = arg.NAV.findActive(arg.carPosition.position.x, arg.carPosition.position.y);
-        active = parseInt(active) + 1
-        var cameraPosition = this.camerasPositions[this.cameraOfPlane[active]].camera;
+        var plane = arg.NAV.planeSet[active];
+        var cameraPosition
+        this.camerasPositions.forEach((c) => {
+          for (var p of c.positions) {
+            if (plane.name === p) {
+              cameraPosition = c.camera
+              break;
+            }
+          }
+        });
+
         arg.renderingEnvironment.camera.position.x = cameraPosition.x;
         arg.renderingEnvironment.camera.position.y = cameraPosition.y;
         arg.renderingEnvironment.camera.position.z = cameraPosition.z;

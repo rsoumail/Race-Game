@@ -1,8 +1,9 @@
 TurnManagement = function() {
 
   this.lastActive = 0;
-  this.finishedRace = false;
+  finishedRace = false;
   var wrongDir = false;
+  var begin = false;
 
   this.dflt = {
     min: 0,
@@ -63,7 +64,7 @@ TurnManagement = function() {
   this.turnMax = 3;
 
   var lapsTimes = [];
-  var startLapTime = (new Date()).getTime();
+  var startLapTime ;
 
   var elapsedTime;
 
@@ -83,6 +84,10 @@ TurnManagement = function() {
       wrongDir = false;
       this.lastActive = parseInt(active)
     }
+    if(this.lastActive === 29 && parseInt(active) ===0 ){
+      wrongDir = false;
+      this.lastActive = parseInt(active)
+    }
 
     var plane = NAV.planeSet[active];
     for (var c of this.turnCheckPoints) {
@@ -91,6 +96,11 @@ TurnManagement = function() {
         break
       }
     }
+  }
+
+  this.begin = function(){
+    startLapTime = (new Date()).getTime();
+    begin = true;
   }
 
   this.switchTurn = function() {
@@ -104,6 +114,10 @@ TurnManagement = function() {
     return turnChecked
   }
 
+  this.isFinishedRace = function (){
+    return finishedRace;
+  }
+
   this.resetCheckPoints = function (){
     for (var c of this.turnCheckPoints) {
       c.passed = false
@@ -115,9 +129,9 @@ TurnManagement = function() {
       var now = (new Date()).getTime();
       lapsTimes.push((now - startLapTime) / 1000);
       startLapTime = now;
-      this.numberOfTurn++
+      this.numberOfTurn++;
       if (this.numberOfTurn === this.turnMax) {
-        this.finishedRace = true;
+        finishedRace = true;
       }
       this.resetCheckPoints();
     }
@@ -193,7 +207,8 @@ TurnManagement = function() {
 
   this.reset = function() {
     this.numberOfTurn = 0;
-    this.finishedRace = false;
+    lapsTimes = [];
+    finishedRace = false;
     this.turnCounter.refresh(this.numberOfTurn)
     this.resetCheckPoints();
     document.getElementById("lap1").innerHTML = "";
@@ -204,19 +219,28 @@ TurnManagement = function() {
   }
 
   setInterval(function() {
-    elapsedTime = Math.round(((new Date()).getTime() - startLapTime) / 10) / 100;
-    document.getElementById("elapsedTime").innerHTML = elapsedTime;
-    var index = 0;
-    for (var lap of lapsTimes) {
-      document.getElementById("lap" + (index + 1)).innerHTML = "Tour " + parseInt(index + 1) + " :" + lap
-      index++
-    }
-    if (wrongDir === true) {
-      console.log("wrongDirection")
-      document.getElementById("wrongtext").innerHTML = "Mauvaise Direction";
-    }
-    else {
-      document.getElementById("wrongtext").innerHTML = "";
+    if(begin === true){
+      elapsedTime = Math.round(((new Date()).getTime() - startLapTime) / 10) / 100;
+      document.getElementById("elapsedTime").innerHTML = "Temps: "  + elapsedTime;
+      var index = 0;
+      for (var lap of lapsTimes) {
+        document.getElementById("lap" + (index + 1)).innerHTML = "Tour " + parseInt(index + 1) + ": " + lap
+        index++
+      }
+      if (wrongDir === true) {
+        document.getElementById("wrongtext").innerHTML = "Mauvaise Direction";
+      }
+      else {
+        document.getElementById("wrongtext").innerHTML = "";
+      }
+      if(finishedRace === true){
+        document.getElementById("wrongtext").innerHTML = ""
+        document.getElementById("finishedtext").innerHTML = "Course Terminée";
+        document.getElementById("elapsedTime").innerHTML = "";
+      }
+      else {
+        document.getElementById("finishedtext").innerHTML = "";
+      }
     }
   }, 30);
 }

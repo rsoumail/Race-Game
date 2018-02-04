@@ -37,6 +37,8 @@ function start() {
   //	keyPressed
   var currentlyPressedKeys = {};
 
+  var begin = false;
+
   // car Position
   var CARx = -220;
   var CARy = 0;
@@ -250,6 +252,9 @@ function start() {
     vehicle: vehicle
   }
 
+  cameraManagement.switchCamera(args);
+  cameraManagement.switchCamera(args);
+
   // DEBUG
   //NAV.debug();
   //var navMesh = NAV.toMesh();
@@ -264,6 +269,7 @@ function start() {
 
   //	callback functions
   //	---------------------------------------------------------------------------
+
   function handleKeyDown(event) {
     currentlyPressedKeys[event.keyCode] = true;
   }
@@ -281,27 +287,31 @@ function start() {
       });
     }
     if (currentlyPressedKeys[80]) { // (P) change camera
-      reset()
-    }
-    if (currentlyPressedKeys[80]) { // (P) change camera
       cameraManagement.switchCamera(args)
     }
-    if (currentlyPressedKeys[68]) // (D) Right
-    {
-      vehicle.turnRight(1000);
+    if(turnManagement.isFinishedRace() === false){
+      if (currentlyPressedKeys[68]) // (D) Right
+      {
+        vehicle.turnRight(1000);
+      }
+      if (currentlyPressedKeys[81]) // (Q) Left
+      {
+        vehicle.turnLeft(1000);
+      }
+      if (currentlyPressedKeys[90]) // (Z) Up
+      {
+        if(begin === false){
+          turnManagement.begin();
+          begin = true;
+        }
+        vehicle.goFront(1200, 1200);
+      }
+      if (currentlyPressedKeys[83]) // (S) Down
+      {
+        vehicle.brake(100);
+      }
     }
-    if (currentlyPressedKeys[81]) // (Q) Left
-    {
-      vehicle.turnLeft(1000);
-    }
-    if (currentlyPressedKeys[90]) // (Z) Up
-    {
-      vehicle.goFront(1200, 1200);
-    }
-    if (currentlyPressedKeys[83]) // (S) Down
-    {
-      vehicle.brake(100);
-    }
+
     if (currentlyPressedKeys[39]) // Arrow Right
     {
       helicopter.turnRight();
@@ -328,9 +338,6 @@ function start() {
     renderingEnvironment.onWindowResize(window.innerWidth, window.innerHeight);
   }
 
-  function reset(){
-
-  }
 
   function render() {
     requestAnimationFrame(render);
