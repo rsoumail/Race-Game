@@ -76,7 +76,6 @@ TurnManagement = function() {
         if(c.plane === plane.name){
           c.passed = true
           lastPlane = c;
-          console.log(plane.name + ' Passed ')
         }
       })
     }
@@ -95,7 +94,6 @@ TurnManagement = function() {
    this.countTurn = function(NAV, carPosition){
       if(this.switchTurn() === true && this.passedArrived(NAV, carPosition) === true){
           this.numberOfTurn++
-          console.log('Turn '  + this.numberOfTurn)
       this.turnCheckPoints.forEach((c) => {
           c.passed = false
        })

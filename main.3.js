@@ -129,7 +129,7 @@ function start()
 	particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(
          {r:0.5,g:0,b:0},{r:0,g:0,b:0.5}
    ));*/
-	 var white = { r: 1, g: 1, b: 1 };
+	var white = { r: 1, g: 1, b: 1 };
 	var lightGrey = { r: 0.9, g: 0.9, b: 0.8 };
 	var blue = { r: 0, g: 0, b: 1 };
 	var red = { r: 0.7, g: 0, b: 0 }
