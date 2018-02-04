@@ -137,40 +137,6 @@ TurnManagement = function() {
     }
   }
 
-  this.passedArrived = function(NAV, carPosition) {
-    var passedArrived = false;
-    var active = NAV.findActive(carPosition.position.x, carPosition.position.y);
-    var plane = NAV.planeSet[active];
-    if(lastPlane.plane !== plane.name){
-      this.turnCheckPoints.forEach((c) => {
-        if(c.plane === plane.name){
-          c.passed = true
-          lastPlane = c;
-        }
-      })
-    }
-  }
-
-  this.switchTurn = function(){
-      var turnChecked = true;
-      this.turnCheckPoints.forEach((p) => {
-        if(p.passed === false){
-          turnChecked = false;
-        }
-      })
-      return turnChecked
-   }
-
-   this.countTurn = function(NAV, carPosition){
-      if(this.switchTurn() === true && this.passedArrived(NAV, carPosition) === true){
-          this.numberOfTurn++
-      this.turnCheckPoints.forEach((c) => {
-          c.passed = false
-       })
-     }
-     this.updateTurnCounter(this.numberOfTurn)
-   }
-
    this.passedArrived = function(NAV, carPosition){
      var passedArrived = false;
      var active = NAV.findActive(carPosition.position.x, carPosition.position.y);
@@ -182,16 +148,6 @@ TurnManagement = function() {
      return passedArrived;
    }
 
-   this.updateTurnCounter = function(turn){
-     //this.turnCounter.refresh(turn)
-   }
-
-    if ((plane.ymin) === 120) {
-      passedArrived = true;
-    }
-    return passedArrived;
-  }
-
   this.updateTurnCounter = function() {
     if (this.lastTurn !== this.numberOfTurn) {
       this.turnCounter.refresh(this.numberOfTurn)
@@ -201,7 +157,7 @@ TurnManagement = function() {
 
   this.resetCheckPoints = function (){
     for (var c of this.turnCheckPoints) {
-      c.passed = false
+      c.passed = false;
     }
   }
 
