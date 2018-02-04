@@ -1,338 +1,477 @@
-if(typeof(ModulesLoader)=="undefined")
-{
-	throw "ModulesLoaderV2.js is required to load script Helicopter.js" ;
+if (typeof(ModulesLoader) == "undefined") {
+  throw "ModulesLoaderV2.js is required to load script FlyingVehicle.js";
 }
 // Loads dependencies and initializes this module
-ModulesLoader.requireModules(['threejs/three.min.js', 'Physics.js', 'DebugHelper.js']) ;
+ModulesLoader.requireModules(['threejs/three.min.js', 'Physics.js', 'DebugHelper.js']);
 
 /** An Helicopter
  *
  * @param configuration
  * @returns {Helicopter}
  */
-function Helicopter(configuration)
-{
-  if(!configuration.hasOwnProperty('position')) { configuration.position = new THREE.Vector3(0.0,0.0,0.0) ; }
-	if(!configuration.hasOwnProperty('mass')) { configuration.mass = 50 ; }
-	if(!configuration.hasOwnProperty('xLength')) { configuration.xLength = 5 ; }
-	if(!configuration.hasOwnProperty('yLength')) { configuration.yLength = 2 ; }
-	if(!configuration.hasOwnProperty('zLength')) { configuration.zLength = 2 ; }
-	if(!configuration.hasOwnProperty('xAngle')) { configuration.xAngle = 0.5 ; }
-	if(!configuration.hasOwnProperty('yAngle')) { configuration.yAngle = 0.5 ; }
-	if(!configuration.hasOwnProperty('zAngle')) { configuration.zAngle = 0.0 ; }
-
-  /* Add 3D object which embeded all helicopter parts */
-  //this.helicopter = new THREE.Object3D();
-  this.position = configuration.position
-  this.speed = new THREE.Vector3(0.0,0.0,0.0) ;
-	this.mass = configuration.mass ; //50.0 ;
-
-  this.speed = new THREE.Vector3(0.0,0.0,0.0) ;
-  this.force = new THREE.Vector3(0.0,0.0,0.0) ;
-	this.momentum = new THREE.Vector3(0.0,0.0,0.0) ;
-
-  this.angles = new THREE.Vector3(configuration.xAngle, configuration.yAngle, configuration.zAngle) ;
-	this.angularSpeed = new THREE.Vector3(0.0,0.0,0.0) ;
-
-	this.xLength = configuration.xLength ;
-	this.yLength = configuration.yLength  ;
-	this.zLength = configuration.zLength  ;
-
-	this.force = new THREE.Vector3(0.0,0.0,0.0) ;
-	this.momentum = new THREE.Vector3(0.0,0.0,0.0) ;
-
-  this.turn = false ;
-
-  this.composeParts = function(helicopter, Loader){
-    /* Add helicopter body */
-    helicopter.position.x = this.position.x ;
-    helicopter.position.y = this.position.y ;
-    helicopter.position.z = this.position.z ;
-
-    this.helicoCorp = new THREE.Object3D();
-    this.helicoCorp.position.set(0, 0, 0) ;
-    Loader.load({filename: 'assets/helico/helicoCorp.obj', node: this.helicoCorp, name: 'helico_corps'})
-    helicopter.add(this.helicoCorp)
-
-    /* Add rigth turbine */
-
-    this.turbineDroite = new THREE.Object3D();
-    this.turbineDroite.position.set(8.5,-3,4) ;
-    Loader.load({filename: 'assets/helico/turbine.obj', node: this.turbineDroite, name: 'turbine_droite'})
-    helicopter.add(this.turbineDroite)
-
-    /* Add right axeRotator */
-
-    this.axeDroit = new THREE.Object3D();
-    this.axeDroit.position.set(8.5,-2,4) ;
-    Loader.load({filename: 'assets/helico/axe.obj', node: this.axeDroit, name: 'axe_droite'});
-    helicopter.add(this.axeDroit)
-
-    /* Add pales for rigth axeRotator */
-
-    this.axeDroitPal1 = new THREE.Object3D()
-    this.axeDroitPal1.position.set(8.5,0,4);
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeDroitPal1, name: 'axe_droite_pal_01'})
-    helicopter.add(this.axeDroitPal1)
-    this.axeDroitPal2 = new THREE.Object3D()
-    this.axeDroitPal2.position.set(8.5,0,4);
-    this.axeDroitPal2.rotation.y = - 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeDroitPal2, name: 'axe_droite_pal_02'})
-    helicopter.add(this.axeDroitPal2)
-    this.axeDroitPal3 = new THREE.Object3D()
-    this.axeDroitPal3.position.set(8.5,0,4);
-    this.axeDroitPal3.rotation.y = 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeDroitPal3, name: 'axe_droite_pal_03'})
-    helicopter.add(this.axeDroitPal3)
-
-    /* Add left turbine */
-
-    this.turbineGauche = new THREE.Object3D();
-    this.turbineGauche.position.set(-8.5,-3,4);
-    Loader.load({filename: 'assets/helico/turbine.obj', node: this.turbineGauche, name: 'turbine_gauche'})
-    helicopter.add(this.turbineGauche);
-
-
-    /* Add left axeRotator */
-
-    this.axeGauche = new THREE.Object3D();
-    this.axeGauche.position.set(-8.5,-2,4);
-    Loader.load({filename: 'assets/helico/axe.obj', node: this.axeGauche, name: 'axe_gauche'});
-    helicopter.add(this.axeGauche);
-
-    /* Add pales for left axeRotator */
-
-    this.axeGauchePal1 = new THREE.Object3D()
-    this.axeGauchePal1.position.set(-8.5,0,4);
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeGauchePal1, name: 'axe_gauche_pal_01'})
-    helicopter.add(this.axeGauchePal1)
-    this.axeGauchePal2 = new THREE.Object3D()
-    this.axeGauchePal2.position.set(-8.5,0,4);
-    this.axeGauchePal2.rotation.y = - 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeGauchePal2, name: 'axe_gauche_pal_02'})
-    helicopter.add(this.axeGauchePal2)
-    this.axeGauchePal3 = new THREE.Object3D()
-    this.axeGauchePal3.position.set(-8.5,0,4);
-    this.axeGauchePal3.rotation.y = 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeGauchePal3, name: 'axe_gauche_pal_03'})
-    helicopter.add(this.axeGauchePal3)
-
-
-   /*Add central turbine */
-
-    this.turbineCentrale = new THREE.Object3D();
-    this.turbineCentrale.position.set(0,0,4);
-    this.turbineCentrale.rotation.x =  Math.PI/2;
-    Loader.load({filename: 'assets/helico/turbine.obj', node: this.turbineCentrale, name: 'turbine_centrale'});
-    helicopter.add(this.turbineCentrale);
-
-    /* Add central axeRotator */
-
-    this.axeCentrale = new THREE.Object3D();
-    this.axeCentrale.position.set(0,0,5)
-    this.axeCentrale.rotation.x = Math.PI/2;
-    Loader.load({filename: 'assets/helico/axe.obj', node: this.axeCentrale, name: 'axe_centrale'})
-    helicopter.add(this.axeCentrale);
-
-    /*Add pales for central axeRotator */
-
-    this.axeCentralPal1 = new THREE.Object3D()
-    this.axeCentralPal1.position.set(0,0,7);
-    this.axeCentralPal1.rotation.x = Math.PI/2;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeCentralPal1, name: 'axe_central_pal_01'})
-    helicopter.add(this.axeCentralPal1)
-    this.axeCentralPal2 = new THREE.Object3D()
-    this.axeCentralPal2.position.set(0,0,7);
-    this.axeCentralPal2.rotation.x = Math.PI/2;
-    this.axeCentralPal2.rotation.y = - 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeCentralPal2, name: 'axe_central_pal_02'})
-    helicopter.add(this.axeCentralPal2)
-    this.axeCentralPal3 = new THREE.Object3D()
-    this.axeCentralPal3.position.set(0,0,7);
-    this.axeCentralPal3.rotation.x = Math.PI/2;
-    this.axeCentralPal3.rotation.y = 2*Math.PI/3;
-    Loader.load({filename: 'assets/helico/pale.obj', node: this.axeCentralPal3, name: 'axe_central_pal_03'})
-    helicopter.add(this.axeCentralPal3)
-
-    return helicopter;
+function Helicopter(configuration) {
+  if (!configuration.hasOwnProperty('position')) {
+    configuration.position = new THREE.Vector3(0.0, 0.0, 0.0);
   }
+  if (!configuration.hasOwnProperty('xAngle')) {
+    configuration.xAngle = 0.0;
+  }
+  if (!configuration.hasOwnProperty('yAngle')) {
+    configuration.yAngle = 0.0;
+  }
+  if (!configuration.hasOwnProperty('zAngle')) {
+    configuration.zAngle = 0.0;
+  }
+
+  this.position = new THREE.Object3D();
+  this.position.position.x = configuration.position.x;
+  this.position.position.y = configuration.position.y;
+  this.position.position.z = configuration.position.z;
+
+
+  this.palesSpeed = 0;
+  this.PALE_BASE_ANGULAR_SPEED = 2;
+  this.PALE_ANGULAR_SPEED_COEF = 1 / 60;
+
+  this.turbineRotationSpeed = 2 * Math.PI / 60;
+  this.corpRotationSpeed = 2 * Math.PI / 120;
+  this.corpRotation = 0;
+  this.turbineRotation = 0;
+
+
+  this.speed = 0; // px/frame
+  this.MAX_SPEED = 10; // px/frame
+  this.acceleration = 0.5; // px.frame^-2
+  this.frictionDeceleration = 0.1;
+  this.steps = 50;
+  this.avancement = 0;
+
+  this.curves = {
+    position: [],
+    speed: [],
+    acceleration: []
+  };
+
+
+  p = [
+    new THREE.Vector3(-170, -20, 150),
+    new THREE.Vector3(-170, 250, 150),
+    new THREE.Vector3(170, 250, 150),
+    new THREE.Vector3(170, 0, 150),
+    new THREE.Vector3(170, 0, 150),
+    new THREE.Vector3(170, -250, 150),
+    new THREE.Vector3(-170, -250, 150),
+    new THREE.Vector3(-170, -20, 150)
+  ];
+
+
+  /*Bezier */
+
+  this.curve1 = new THREE.CubicBezierCurve3(
+    p[0],
+    p[1],
+    p[2],
+    p[3]
+  );
+
+  this.curve2 = new THREE.CubicBezierCurve3(
+    p[4],
+    p[5],
+    p[6],
+    p[7]
+  );
+
+  this.points1 = this.curve1.getPoints(50);
+  this.points2 = this.curve2.getPoints(50);
+
+  var starsGeometry = new THREE.Geometry();
+
+  this.points1.forEach((p) => {
+    starsGeometry.vertices.push(p);
+  });
+  this.points2.forEach((p) => {
+    starsGeometry.vertices.push(p);
+  });
+
+  var material = new THREE.LineBasicMaterial({
+    color: 0xff0000
+  });
+
+  this.curveObject = new THREE.Line(starsGeometry, material);
+
+  this.helicoParts = {
+    turbineDroite: new THREE.Object3D(),
+    axeDroit: new THREE.Object3D(),
+    axeDroitPal1: new THREE.Object3D(),
+    axeDroitPal2: new THREE.Object3D(),
+    axeDroitPal3: new THREE.Object3D(),
+    turbineGauche: new THREE.Object3D(),
+    axeGauche: new THREE.Object3D(),
+    axeGauchePal1: new THREE.Object3D(),
+    axeGauchePal2: new THREE.Object3D(),
+    axeGauchePal3: new THREE.Object3D(),
+    turbineCentral: new THREE.Object3D(),
+    axeCentral: new THREE.Object3D(),
+    axeCentralPal1: new THREE.Object3D(),
+    axeCentralPal2: new THREE.Object3D(),
+    axeCentralPal3: new THREE.Object3D()
+  }
+
+  configuration.Loader.load({
+    filename: 'assets/helico/helicoCorp.obj',
+    node: this.position,
+    name: 'helico_corps'
+  })
+
+  /* Add rigth turbine */
+
+
+  this.helicoParts.turbineDroite.position.set(8.5, -3, 4);
+  configuration.Loader.load({
+    filename: 'assets/helico/turbine.obj',
+    node: this.helicoParts.turbineDroite,
+    name: 'turbine_droite'
+  })
+  this.position.add(this.helicoParts.turbineDroite)
+
+  /* Add right axeRotator */
+
+  this.helicoParts.axeDroit.position.y = 1;
+  configuration.Loader.load({
+    filename: 'assets/helico/axe.obj',
+    node: this.helicoParts.axeDroit,
+    name: 'axe_droite'
+  });
+  this.helicoParts.turbineDroite.add(this.helicoParts.axeDroit)
+
+  /* Add pales for rigth axeRotator */
+
+
+  this.helicoParts.axeDroitPal1.position.y = 2.9;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeDroitPal1,
+    name: 'axe_droite_pal_01'
+  })
+  this.helicoParts.turbineDroite.add(this.helicoParts.axeDroitPal1)
+
+  this.helicoParts.axeDroitPal2.position.y = 2.9;
+  this.helicoParts.axeDroitPal2.rotation.y = -2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeDroitPal2,
+    name: 'axe_droite_pal_02'
+  })
+  this.helicoParts.turbineDroite.add(this.helicoParts.axeDroitPal2)
+
+  this.helicoParts.axeDroitPal3.position.y = 2.9;
+  this.helicoParts.axeDroitPal3.rotation.y = 2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeDroitPal3,
+    name: 'axe_droite_pal_03'
+  })
+  this.helicoParts.turbineDroite.add(this.helicoParts.axeDroitPal3)
+
+  /* Add left turbine */
+
+  this.helicoParts.turbineGauche.position.set(-8.5, -3, 4);
+  configuration.Loader.load({
+    filename: 'assets/helico/turbine.obj',
+    node: this.helicoParts.turbineGauche,
+    name: 'turbine_gauche'
+  })
+  this.position.add(this.helicoParts.turbineGauche);
+
+
+  /* Add left axeRotator */
+
+  this.helicoParts.axeGauche.position.y = 1;
+  configuration.Loader.load({
+    filename: 'assets/helico/axe.obj',
+    node: this.helicoParts.axeGauche,
+    name: 'axe_gauche'
+  });
+  this.helicoParts.turbineGauche.add(this.helicoParts.axeGauche);
+
+  /* Add pales for left axeRotator */
+
+  this.helicoParts.axeGauchePal1.position.y = 2.9
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeGauchePal1,
+    name: 'axe_gauche_pal_01'
+  })
+  this.helicoParts.turbineGauche.add(this.helicoParts.axeGauchePal1)
+
+  this.helicoParts.axeGauchePal2.position.y = 2.9
+  this.helicoParts.axeGauchePal2.rotation.y = -2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeGauchePal2,
+    name: 'axe_gauche_pal_02'
+  })
+  this.helicoParts.turbineGauche.add(this.helicoParts.axeGauchePal2)
+
+  this.helicoParts.axeGauchePal3.position.y = 2.9
+  this.helicoParts.axeGauchePal3.rotation.y = 2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeGauchePal3,
+    name: 'axe_gauche_pal_03'
+  })
+  this.helicoParts.turbineGauche.add(this.helicoParts.axeGauchePal3)
+
+
+  /*Add central turbine */
+
+  this.helicoParts.turbineCentral.position.set(0, 0, 4);
+  this.helicoParts.turbineCentral.rotation.x = Math.PI / 2;
+  configuration.Loader.load({
+    filename: 'assets/helico/turbine.obj',
+    node: this.helicoParts.turbineCentral,
+    name: 'turbine_centrale'
+  });
+  this.position.add(this.helicoParts.turbineCentral);
+
+  /* Add central axeRotator */
+
+  this.helicoParts.axeCentral.position.y = 1
+  configuration.Loader.load({
+    filename: 'assets/helico/axe.obj',
+    node: this.helicoParts.axeCentral,
+    name: 'axe_centrale'
+  })
+  this.helicoParts.turbineCentral.add(this.helicoParts.axeCentral);
+
+  /*Add pales for central axeRotator */
+
+  this.helicoParts.axeCentralPal1.position.y = 2.9;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeCentralPal1,
+    name: 'axe_central_pal_01'
+  })
+  this.helicoParts.turbineCentral.add(this.helicoParts.axeCentralPal1)
+
+  this.helicoParts.axeCentralPal2.position.y = 2.9;
+  this.helicoParts.axeCentralPal2.rotation.y = -2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeCentralPal2,
+    name: 'axe_central_pal_02'
+  })
+  this.helicoParts.turbineCentral.add(this.helicoParts.axeCentralPal2)
+
+  this.helicoParts.axeCentralPal3.position.y = 2.9;
+  this.helicoParts.axeCentralPal3.rotation.y = 2 * Math.PI / 3;
+  configuration.Loader.load({
+    filename: 'assets/helico/pale.obj',
+    node: this.helicoParts.axeCentralPal3,
+    name: 'axe_central_pal_03'
+  })
+  this.helicoParts.turbineCentral.add(this.helicoParts.axeCentralPal3)
 
   /* Methods  */
 
-  this.updatePalesSpeedRotation = function(force){
-    helicopter.axeDroitPal1.rotation.y += force;
-    helicopter.axeDroitPal2.rotation.y += force;
-    helicopter.axeDroitPal3.rotation.y += force;
-    helicopter.axeGauchePal1.rotation.y += force;
-    helicopter.axeGauchePal2.rotation.y += force;
-    helicopter.axeGauchePal3.rotation.y += force;
-    helicopter.axeCentralPal1.rotation.y += force;
-    helicopter.axeCentralPal2.rotation.y += force;
-    helicopter.axeCentralPal3.rotation.y += force;
+
+
+  this.cubicdt = function(p, t) {
+    var r = new THREE.Vector3(0, 0, 0);
+    r.add(p[0].clone().multiplyScalar(-3 * t * t));
+    r.add(p[1].clone().multiplyScalar(9 * t * t));
+    r.add(p[2].clone().multiplyScalar(-9 * t * t));
+    r.add(p[3].clone().multiplyScalar(3 * t * t));
+    r.add(p[0].clone().multiplyScalar(6 * t));
+    r.add(p[1].clone().multiplyScalar(-12 * t));
+    r.add(p[2].clone().multiplyScalar(6 * t));
+    r.add(p[0].clone().multiplyScalar(-3));
+    r.add(p[1].clone().multiplyScalar(3));
+    return r;
+  };
+
+
+  this.cubicdt2 = function(p, t) {
+    var r = new THREE.Vector3(0, 0, 0);
+    r.add(p[0].clone().multiplyScalar(-6 * t));
+    r.add(p[1].clone().multiplyScalar(18 * t));
+    r.add(p[2].clone().multiplyScalar(-18 * t));
+    r.add(p[3].clone().multiplyScalar(3 * t));
+    r.add(p[0].clone().multiplyScalar(6));
+    r.add(p[1].clone().multiplyScalar(-12));
+    r.add(p[2].clone().multiplyScalar(6));
+    return r;
+  };
+
+  this.interpolate = function(curve, n, p) {
+    var r = [];
+    for (var i = 0; i < n; i++) {
+      r.push(curve(p, (i / n)));
+    }
+    return r;
   }
 
-  this.weight = function()
-	{
-		return this.mass * Physics.G ;
-	} ;
+  this.turnPales = function() {
 
-	/**
-	 *  Resets aplied forces and momentum
-	 */
-	this.reset = function()
-	{
-		this.momentum.set(0,0,0) ;
-		this.force.set(0,0,0) ;
-		this.turn = false ;
-	} ;
+    var coef = (this.palesSpeed / 10 + this.PALE_BASE_ANGULAR_SPEED) * this.PALE_ANGULAR_SPEED_COEF;
 
-  this.multiplyInverseInertia = function(momentum)
-	{
-		var a = this.mass*(this.yLength*this.yLength+this.zLength*this.zLength) ;
-		var b = this.mass*(this.xLength*this.xLength+this.zLength*this.zLength) ;
-		var c = this.mass*(this.xLength*this.xLength+this.yLength*this.yLength) ;
-		return new THREE.Vector3(momentum.x/a, momentum.y/b, momentum.z/c) ;
-	} ;
+    this.helicoParts.axeDroitPal1.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeDroitPal2.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeDroitPal3.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeGauchePal1.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeGauchePal2.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeGauchePal3.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeCentralPal1.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeCentralPal2.rotation.y += 2 * Math.PI * coef;
+    this.helicoParts.axeCentralPal3.rotation.y += 2 * Math.PI * coef;
+  }
+
+  this.setSpeed = function(s) {
+    this.speed = s;
+    if (this.speed > this.MAX_SPEED) {
+      this.speed = this.MAX_SPEED;
+    }
+    if (this.speed < 0) {
+      this.speed = 0;
+    }
+    this.palesSpeed = s;
+  }
+
+  this.setTurbinRotation = function(rotation) {
+    this.helicoParts.turbineDroite.rotation.z = rotation;
+    this.helicoParts.turbineGauche.rotation.z = rotation;
+  }
+
+  this.setRotation = function(rotation) {
+    this.helicoParts.turbineDroite.rotation.z += rotation;
+    this.helicoParts.turbineGauche.rotation.z += rotation;
+  }
+
+  this.setMRotation = function(rotation) {
+    this.position.rotation.z -= rotation;
+  }
+
+  this.turnLeft = function() {
+    //this.setTurbinRotation(this.helicoParts.turbineDroite.rotation.z + this.turbineRotationSpeed)
+    this.setRotation(this.helicoParts.turbineDroite.rotation.z + this.turbineRotationSpeed);
+  }
+
+  this.turnRight = function() {
+    //this.setTurbinRotation(this.helicoParts.turbineDroite.rotation.z - this.turbineRotationSpeed)
+    this.setRotation(this.helicoParts.turbineDroite.rotation.z - this.turbineRotationSpeed);
+  }
+
+  this.speedup = function() {
+    this.setSpeed(this.speed + this.acceleration);
+  }
+
+  this.brake = function() {
+    this.setSpeed(this.speed - this.acceleration);
+  }
+
+  this.handleSpeed = function() {
+    this.setSpeed(this.speed - this.frictionDeceleration);
+    this.position.position.y += this.speed * Math.cos(this.position.rotation.z);
+    this.position.position.x -= this.speed * Math.sin(this.position.rotation.z);
+  }
 
 
-  /** Applies the helicopter rotations to the provided vector
-	 *
-	 */
-	this.applyRotations = function(localVector)
-	{
-    var result = new THREE.Vector3(localVector.x, localVector.y, localVector.z)
-		//var result = localVector.clone() ;
-		result.applyEuler(new THREE.Euler(this.angles.x, this.angles.y, this.angles.z, 'XYZ')) ;
-		return result ;
-	} ;
+  this.handleRotation = function() {
 
-  /**
-	 *  Applies a force on the object
-	 *  @param relativePosition {THREE.Vector3} The position (in local coordinates) of point on which the force
-	 *  	   is applied
-	 *  @param forceVector {THREE.Vector3} The force vector
-	 */
-	this.applyForce = function(relativePosition, forceVector)
-	{
-		var tmp = this.applyRotations(forceVector) ;
-		this.force.add(tmp) ;
-		var oriented = this.applyRotations(relativePosition) ;
-		oriented.cross(tmp) ;
-		this.momentum.add(oriented) ;
-	} ;
+    var turbineRotation = this.helicoParts.turbineDroite.rotation.z;
+    var corpRotation = (this.position.rotation.z + 2 * Math.PI) % (2 * Math.PI);
 
-  this.goUp = function(frontRight,frontLeft,rearRight,rearLeft)
-	{
-		this.applyForce(new THREE.Vector3(this.xLength/2, this.yLength/2, -this.zLength/2), new THREE.Vector3(0,0,frontRight)) ;
-		this.applyForce(new THREE.Vector3(this.xLength/2, -this.yLength/2, -this.zLength/2), new THREE.Vector3(0,0,frontLeft)) ;
-		this.applyForce(new THREE.Vector3(-this.xLength/2, this.yLength/2, -this.zLength/2), new THREE.Vector3(0,0,rearRight)) ;
-		this.applyForce(new THREE.Vector3(-this.xLength/2, -this.yLength/2, -this.zLength/2), new THREE.Vector3(0,0,rearLeft)) ;
-	} ;
+    switch (true) {
+      case turbineRotation > this.corpRotationSpeed:
+        corpRotation += this.corpRotationSpeed;
+        turbineRotation -= this.corpRotationSpeed;
+        break;
 
-	this.goFront = function(left, right)
-	{
-		this.applyForce(new THREE.Vector3(-this.xLength/2, this.yLength/2, 0.0), new THREE.Vector3(right,0,0)) ;
-		this.applyForce(new THREE.Vector3(-this.xLength/2, -this.yLength/2, 0.0), new THREE.Vector3(left,0,0)) ;
-	} ;
+      case turbineRotation < -this.corpRotationSpeed:
+        corpRotation -= this.corpRotationSpeed;
+        turbineRotation += this.corpRotationSpeed;
+        break;
 
-	this.brake = function(strength)
-	{
-		var force = strength*(this.speed.dot(this.frontDirection())) ;
-		this.goFront(-force, -force) ;
-	} ;
+      case turbineRotation > 0:
+        corpRotation = corpRotation - turbineRotation;
+        turbineRotation = 0;
+        break;
 
-	this.turnLeft = function(force)
-	{
-		this.turn = true ;
-		this.applyForce(new THREE.Vector3(-this.xLength/2, -this.yLength/2, 0.0), new THREE.Vector3(0,-force,0)) ;
-		this.applyForce(new THREE.Vector3(this.xLength/2, this.yLength/2, 0.0), new THREE.Vector3(0,force,0)) ;
-	} ;
+      case turbineRotation < 0:
+        corpRotation = corpRotation + turbineRotation;
+        turbineRotation = 0;
+        break;
+    }
 
-	this.turnRight = function(force)
-	{
-		this.turn = true ;
-		this.applyForce(new THREE.Vector3(this.xLength/2, -this.yLength/2, 0.0), new THREE.Vector3(0,-force,0)) ;
-		this.applyForce(new THREE.Vector3(-this.xLength/2, this.yLength/2, 0.0), new THREE.Vector3(0,force,0)) ;
-	} ;
+    this.helicoParts.turbineDroite.rotation.z = turbineRotation;
+    this.helicoParts.turbineGauche.rotation.z = turbineRotation;
+    this.position.rotation.z = corpRotation;
+  }
 
-	this.goRight = function(force)
-	{
-		this.applyForce(new THREE.Vector3(-this.xLength/2, -this.yLength/2, 0.0), new THREE.Vector3(0,-force,0)) ;
-		this.applyForce(new THREE.Vector3(this.xLength/2, -this.yLength/2, 0.0), new THREE.Vector3(0,-force,0)) ;
-	};
+  this.bezierRotation = function() {
 
-	this.goLeft = function(force)
-	{
-		this.applyForce(new THREE.Vector3(-this.xLength/2, this.yLength/2, 0.0), new THREE.Vector3(0,force,0)) ;
-		this.applyForce(new THREE.Vector3(this.xLength/2, this.yLength/2, 0.0), new THREE.Vector3(0,force,0)) ;
-	};
+  }
 
-	this.frontDirection = function()
-	{
-		return this.applyRotations(new THREE.Vector3(1.0,0.0,0.0)) ;
-	} ;
-
-	this.rightDirection = function()
-	{
-		return this.applyRotations(new THREE.Vector3(0.0,1.0,0.0)) ;
-	} ;
-
-	this.upDirection = function()
-	{
-		return this.applyRotations(new THREE.Vector3(0.0,0.0,1.0)) ;
-	} ;
-
-	this.stabilizeSkid = function(factor)
-	{
-		// Stabilization (stops the skid)
-		var dot = this.speed.dot(this.rightDirection());
-		this.goRight(factor*dot) ; // 1000.0
-	} ;
-
-	this.stabilizeTurn = function(factor)
-	{
-		if(!this.turn)
-		{
-			this.turnRight(factor*this.angularSpeed.z) ; // 1000.0
-		}
-	} ;
-
-	this.stopAngularSpeedsXY = function()
-	{
-		this.angularSpeed.x=0.0 ;
-		this.angularSpeed.y=0.0 ;
-	} ;
-
-	/** Updates the vehicle based on provided forces.
-	 *
-	 */
-	this.update = function(dt)
-	{
-		// Forces stabilization around X and Y. (due to some identified instabilities).
-		// Adds gravity
-		this.force.add(new THREE.Vector3(0,0,-this.weight())) ;
-		// Orientation
-		var angularAcceleration = this.multiplyInverseInertia(this.momentum) ;
-		angularAcceleration.multiplyScalar(dt) ;
-		this.angularSpeed.add(angularAcceleration) ;
-		var angularSpeed = this.angularSpeed.clone() ;
-		angularSpeed.multiplyScalar(dt) ;
-		this.angles.add(angularSpeed) ;
-		// Position and speed
-		result = Physics.eulerIntegration(this.mass, dt, this.position, this.speed, this.force) ;
-		this.position = result.position ;
-		this.speed = result.speed ;
-		// Resets everything
-		this.reset() ;
-	} ;
+  this.getCurveObject = function() {
+    return this.curveObject;
+  }
 
 
 
+  this.makeRotation = function() {
+    var speed;
+    var angle;
+    var next;
+    if (this.avancement === 1999) {
+      next = 0;
+    } else {
+      next = this.avancement + 1;
+    }
+    speed = this.curves.position[this.avancement];
+    angle = (speed.angleTo(new THREE.Vector3(this.curves.position[next].x, this.curves.position[next].y, this.curves.position[next].z)));
+    if (this.avancement === 1999)
+      this.position.rotation.z = 0
+
+    if ((this.avancement >= 300 && this.avancement <= 400) ||
+      (this.avancement >= 700 && this.avancement <= 800) ||
+      (this.avancement >= 1300 && this.avancement <= 1400) ||
+      (this.avancement >= 1650 && this.avancement <= 1950)
+    ) {
+      angle = angle * 2
+    }
+    this.setMRotation(angle);
+  }
+
+  this.update = function() {
+    this.handleSpeed();
+    this.turnPales();
+    this.position.position.x = this.curves.position[this.avancement].x;
+    this.position.position.y = this.curves.position[this.avancement].y;
+    this.position.position.z = this.curves.position[this.avancement].z;
+    this.makeRotation();
+    if ((this.avancement + 1) === 2000) {
+      this.tour++
+    }
+    this.avancement = (this.avancement + 1) % 2000;
+
+    //this.handleRotation();
+  }
+
+  this.createBezier = function() {
+    var temp = 0;
+    while (temp <= 1) {
+      this.curves.position.push(this.curve1.getPointAt(temp))
+      temp += 0.001
+    }
+    temp = 0
+    while (temp <= 1) {
+      this.curves.position.push(this.curve2.getPointAt(temp))
+      temp += 0.001
+    }
+  }
+
+  this.createBezier()
 
 
-
-
-  /* Return the 3D object which embeded all parts */
-
-  //return this.helicopter
+  return this;
 }

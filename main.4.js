@@ -35,12 +35,18 @@ function start()
   /*Modif*/
 
   // camera fixe
-  var fixed = true;
+  var fixed = false;
+  var isHelicopter = false;
   // car Position
   var CARx = -220;
   var CARy = 0 ;
   var CARz = 0 ;
   var CARtheta = 0 ;
+
+
+  var Helicox = -170;
+	var Helicoy = -20;
+	var Helicoz = 150;
 
   // Creates the vehicle (handled by physics)
   var vehicle = new FlyingVehicle(
@@ -49,6 +55,11 @@ function start()
         zAngle : CARtheta+Math.PI/2.0,
       }
       ) ;
+
+
+
+
+
 
 
   /*Fin*/
@@ -68,13 +79,6 @@ function start()
   /* Debut  Modifications  */
 
 
-  /*var newNode = new THREE.Object3D();
-  newNode.position.set(-8.5, -2, 4) ;
-  scene.add(newNode) ;
-  newNode.name = 'axe_gauche';*/
-/*  */
-
-
   //	Meshes
   Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
   Loader.loadMesh('assets','ground_Zup_03','obj',	renderingEnvironment.scene,'ground',	-340,-340,0,'front');
@@ -82,16 +86,11 @@ function start()
   //Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
   Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
-  var helicopter = new Helicopter({position: new THREE.Vector3(-240 , -145, 80)});
-//  renderingEnvironment.addToScene(helicopter);
 
-  var helicoPosition = new THREE.Object3D();
-  helicoPosition.name = 'helicopter';
-  // helicoPosition.position.x = -220;
-  // helicoPosition.position.y = 0;
-  // helicoPosition.position.z = 40;
-  helicoPosition = helicopter.composeParts(helicoPosition, Loader)
-  renderingEnvironment.addToScene(helicoPosition);
+  var helicopter = new Helicopter({position: new THREE.Vector3(Helicox , Helicoy, Helicoz), Loader});
+  renderingEnvironment.addToScene(helicopter.curveObject);
+  renderingEnvironment.addToScene(helicopter.position);
+
 
   //	Car
   // car Translation
@@ -115,16 +114,11 @@ function start()
   // simple method to load an object
   var carGeometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: carRotationZ, name: 'car3'}) ;
 
-  carGeometry.position.z= +0.25 ;
-  // attach the scene camera to car
-  carGeometry.add(renderingEnvironment.camera) ;
-  renderingEnvironment.camera.position.x = 0.0 ;
-  renderingEnvironment.camera.position.z = 10.0 ;
-  renderingEnvironment.camera.position.y = -25.0 ;
-  renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
 
   //	Skybox
   Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
+
+
 
   var cameraManagement = new CameraManagement();
 
@@ -166,10 +160,23 @@ function start()
   NAV.setPos(CARx,CARy,CARz);
   NAV.initActive();
 
+  var args = {
+    helicopter: helicopter,
+    renderingEnvironment: renderingEnvironment,
+    NAV: NAV,
+    carPosition: carPosition,
+    carGeometry: carGeometry,
+    vehicle: vehicle
+  }
 
-  var x = 0;
-  var y = 0;
-  var z = 80;
+
+  // carGeometry.add(renderingEnvironment.camera) ;
+  // renderingEnvironment.camera.position.x = 0.0 ;
+  // renderingEnvironment.camera.position.z = 100.0 ;
+  // renderingEnvironment.camera.position.y = -25.0 ;
+  // renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
+  // renderingEnvironment.camera.rotation.y = 0.0 ;
+  // renderingEnvironment.camera.rotation.z = 0.0 ;
 
 
   /*modif*/
@@ -177,6 +184,9 @@ function start()
 	NAV.debug();
 	var navMesh = NAV.toMesh();
 	renderingEnvironment.addToScene(navMesh);
+
+
+  //setHelicopterCamera()
 	//	event listener
 
 
@@ -210,23 +220,50 @@ function start()
 			});
 		}
 		var rotationIncrement = 0.05 ;
+    if (currentlyPressedKeys[80]) { // (P) change camera
+      fixed = !fixed;
+      cameraManagement.switch(args)
+    }
 		if (currentlyPressedKeys[68]) // (D) Right
 		{
 			renderingEnvironment.scene.rotateOnAxis(new THREE.Vector3(0.0,1.0,0.0), rotationIncrement) ;
+      //vehicle.turnRight(1000) ;
 		}
 		if (currentlyPressedKeys[81]) // (Q) Left
 		{
 			renderingEnvironment.scene.rotateOnAxis(new THREE.Vector3(0.0,1.0,0.0), -rotationIncrement) ;
+    //  vehicle.turnLeft(1000) ;
 		}
 		if (currentlyPressedKeys[90]) // (Z) Up
 		{
-      helicopter.goFront(1200, 1200);
+      //vehicle.goFront(1200, 1200);
+      //helicopter.moveUp() ;
 			renderingEnvironment.scene.rotateOnAxis(new THREE.Vector3(1.0,0.0,0.0), rotationIncrement) ;
 		}
 		if (currentlyPressedKeys[83]) // (S) Down
 		{
-			renderingEnvironment.scene.rotateOnAxis(new THREE.Vector3(1.0,0.0,0.0), -rotationIncrement) ;
+		    renderingEnvironment.scene.rotateOnAxis(new THREE.Vector3(1.0,0.0,0.0), -rotationIncrement) ;
+    //  vehicle.brake(100) ;
 		}
+    if (currentlyPressedKeys[39]) // Arrow Right
+		{
+      helicopter.turnRight() ;
+		}
+    if (currentlyPressedKeys[37]) // Arrow Left
+    {
+
+      helicopter.turnLeft() ;
+    }
+    if (currentlyPressedKeys[38]) // Arrow up
+    {
+
+      helicopter.speedup() ;
+
+    }
+    if (currentlyPressedKeys[40]) // Arrow Down
+    {
+      helicopter.brake() ;
+    }
 	}
 
 	//	window resize
@@ -236,91 +273,74 @@ function start()
 		renderingEnvironment.onWindowResize(window.innerWidth,window.innerHeight);
 	}
 
+  var clock = new THREE.Clock();
+
 	function render() {
 		requestAnimationFrame( render );
 		handleKeys();
 
     /*DEbut MOdif */
 
-    /*vehicle.stabilizeSkid(50) ;
-		vehicle.stabilizeTurn(1000) ;
-		var oldPosition = vehicle.position.clone() ;
-		vehicle.update(1.0/60) ;
-		var newPosition = vehicle.position.clone() ;
-		newPosition.sub(oldPosition) ;
-		// NAV
-		NAV.move(newPosition.x, newPosition.y, 150,10) ;
-		// carPosition
-		carPosition.position.set(NAV.x, NAV.y, NAV.z) ;
-		// Updates the vehicle
-		vehicle.position.x = NAV.x ;
-		vehicle.position.y = NAV.Y ;
-		// Updates carFloorSlope
-		carFloorSlope.matrixAutoUpdate = false;
-		carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
-		// Updates carRotationZ
-		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0 ;*/
+    if(!isHelicopter){
+      // vehicle.stabilizeSkid(50) ;
+  		// vehicle.stabilizeTurn(1000) ;
+  		// var oldPosition = vehicle.position.clone() ;
+  		// vehicle.update(1.0/60) ;
+  		// var newPosition = vehicle.position.clone() ;
+  		// newPosition.sub(oldPosition) ;
+  		// // NAV
+  		// NAV.move(newPosition.x, newPosition.y, 150,10) ;
+  		// // carPosition
+  		// carPosition.position.set(NAV.x, NAV.y, NAV.z) ;
+  		// // Updates the vehicle
+  		// vehicle.position.x = NAV.x ;
+  		// vehicle.position.y = NAV.Y ;
+  		// // Updates carFloorSlope
+  		// carFloorSlope.matrixAutoUpdate = false;
+  		// carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
+  		// // Updates carRotationZ
+  		// carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0 ;
+    }
+    else {
 
 
-    helicopter.axeDroitPal1.rotation.y += 0.1;
-    helicopter.axeDroitPal2.rotation.y += 0.1;
-    helicopter.axeDroitPal3.rotation.y += 0.1;
-    helicopter.axeGauchePal1.rotation.y += 0.1;
-    helicopter.axeGauchePal2.rotation.y += 0.1;
-    helicopter.axeGauchePal3.rotation.y += 0.1;
-    helicopter.axeCentralPal1.rotation.y += 0.1;
-    helicopter.axeCentralPal2.rotation.y += 0.1;
-    helicopter.axeCentralPal3.rotation.y += 0.1;
+    }
 
-    x += 1;
-    y += 1;
-    //z += 0;
+  //  var helico_speed = Math.floor(Math.sqrt(Math.pow(helico.speed.x, 2) + Math.pow(helico.speed.y, 2) + Math.pow(helico.speed.z, 2)));
+  //  var delta_rotation_speed = 0.2 + helico_speed * 0.05;
 
-    helicopter.applyForce(new THREE.Vector3(x,y,z), 100)
-    var result = new THREE.Vector3(x,y,z)
-    // helicoPosition.position.x = result.x
-     //helicoPosition.position.y = result.y
-    // helicoPosition.position.z = result.z
-  //  helicopter.update(1.0/60) ;
+
+      /*  helico.goUp(helico.weight()/4.0, helico.weight()/4.0, helico.weight()/4.0, helico.weight()/4.0) ;
+        helico.stopAngularSpeedsXY() ;
+        helico.stabilizeSkid(50) ;
+        helico.stabilizeTurn(1000) ;
+        helico.update(1/60);
+        helicopter.helicopterPosition.position.set(helico.position.x, helico.position.y, helico.position.z);
+      //  helicopter.helicopterRotationZ.rotation.z = helico.angles.z-Math.PI/2;*/
 
 
 
-    /*helicopter.stabilizeSkid(50) ;
-		helicopter.stabilizeTurn(1000) ;
-		var oldPosition = vehicle.position.clone() ;
-		helicopter.update(1.0/60) ;
-		var newPosition = helicopter.position.clone() ;
-		newPosition.sub(oldPosition) ;
-		// NAV
-		NAV.move(newPosition.x, newPosition.y, 150,10) ;
-		// carPosition
-		helicoPosition.position.set(NAV.x, NAV.y, 80) ;*/
-		// Updates the vehicle
-		/*helicopter.position.x = NAV.x ;
-		helicopter.position.y = NAV.y ;*/
-		// Updates carFloorSlope
-		/*carFloorSlope.matrixAutoUpdate = false;
-		carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
-		// Updates carRotationZ
-		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0 ;*/
 
 
-    /*carGeometry.add(renderingEnvironment.camera) ;
-    renderingEnvironment.camera.position.x = 0.0 ;
-    renderingEnvironment.camera.position.z = 100.0 ;
-    renderingEnvironment.camera.position.y = -25.0 ;
-    renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
-    renderingEnvironment.camera.rotation.y = 0.0 ;
-    renderingEnvironment.camera.rotation.z = 0.0 ;*/
 
-
-  renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
+    helicopter.update()
+    renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.render(args));
+    //renderingEnvironment.renderer.render(renderingEnvironment.scene, cameraManagement.switchCamera(fixed, NAV, carPosition, carGeometry, renderingEnvironment))
     /*Fin Module */
 
+    /**/
 
-		// Rendering
+
+    // Vehicle stabilization
+
+    /**/
+
+
+
 		//renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 	};
+
+
 
 	render();
 }
