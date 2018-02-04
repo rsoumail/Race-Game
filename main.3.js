@@ -16,6 +16,10 @@ requirejs(['ModulesLoaderV2.js'], function() {
     "myJS/SpeedManagement.js",
     "Helicopter.js"
   ]);
+  ModulesLoader.requireModules(["ParticleSystem.js",
+    "Interpolators.js",
+    "MathExt.js"
+  ]);
 
   // Loads modules contained in includes and starts main function
   ModulesLoader.loadModules(start);
@@ -40,6 +44,8 @@ function start() {
   var CARtheta = 0;
 
   // helico posotion
+
+  var finishedRace = false;
 
   var Helicox = -170;
   var Helicoy = -20;
@@ -78,73 +84,86 @@ function start() {
   renderingEnvironment.addToScene(helicopter.position);
 
   //Particles
-	//Système de particules
+  //Système de particules
 
 
-	var particlesFeature = new ParticleSystem.Engine_Class({
-		particlesCountMax: 1000,
-		textureFile: "assets/particles/particle.png",
-		blendingMode: THREE.AdditiveBlending
-	});
+  var particlesFeature = new ParticleSystem.Engine_Class({
+    particlesCountMax: 1000,
+    textureFile: "assets/particles/particle.png",
+    blendingMode: THREE.AdditiveBlending
+  });
 
-	var emitterParticlesD = new ParticleSystem.ConeEmitter_Class({
-		cone: {
-				center: new THREE.Vector3(2.7,-8,2),
-				height: new THREE.Vector3(0,-0.5,0),
-				radius: 0.2,
-				flow: 100,
-		},
-		particle: {
-			speed: new MathExt.Interval_Class(10, 20),
-					mass: new MathExt.Interval_Class(0.1, 0.1),
-					size: new MathExt.Interval_Class(0.1, 4),
-					lifeTime: new MathExt.Interval_Class(0.5, 10)
-		}
-	});
+  var emitterParticlesD = new ParticleSystem.ConeEmitter_Class({
+    cone: {
+      center: new THREE.Vector3(2.7, -8, 2),
+      height: new THREE.Vector3(0, -0.5, 0),
+      radius: 0.2,
+      flow: 100,
+    },
+    particle: {
+      speed: new MathExt.Interval_Class(10, 20),
+      mass: new MathExt.Interval_Class(0.1, 0.1),
+      size: new MathExt.Interval_Class(0.1, 4),
+      lifeTime: new MathExt.Interval_Class(0.5, 10)
+    }
+  });
 
-	var emitterParticlesG = new ParticleSystem.ConeEmitter_Class({
-		cone: {
-				center: new THREE.Vector3(-2.7,-8,2),
-				height: new THREE.Vector3(0,-0.5,0),
-				radius: 0.2,
-				flow: 100,
-		},
-		particle: {
-			speed: new MathExt.Interval_Class(10, 20),
-					mass: new MathExt.Interval_Class(0.1, 0.1),
-					size: new MathExt.Interval_Class(0.1, 4),
-					lifeTime: new MathExt.Interval_Class(0.5, 10)
-		}
-	});
+  var emitterParticlesG = new ParticleSystem.ConeEmitter_Class({
+    cone: {
+      center: new THREE.Vector3(-2.7, -8, 2),
+      height: new THREE.Vector3(0, -0.5, 0),
+      radius: 0.2,
+      flow: 100,
+    },
+    particle: {
+      speed: new MathExt.Interval_Class(10, 20),
+      mass: new MathExt.Interval_Class(0.1, 0.1),
+      size: new MathExt.Interval_Class(0.1, 4),
+      lifeTime: new MathExt.Interval_Class(0.5, 10)
+    }
+  });
 
-	//var emitterParticles = new ParticleSystem.ConeEmitter_Class(particlesEmitterG);
+  //var emitterParticles = new ParticleSystem.ConeEmitter_Class(particlesEmitterG);
 
-	particlesFeature.addEmitter(emitterParticlesD);
-	particlesFeature.addEmitter(emitterParticlesG);
+  particlesFeature.addEmitter(emitterParticlesD);
+  particlesFeature.addEmitter(emitterParticlesG);
 
-	particlesFeature.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+  particlesFeature.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
 
-	particlesFeature.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+  particlesFeature.addModifier(new ParticleSystem.LifeTimeModifier_Class());
 
-	particlesFeature.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
+  particlesFeature.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
 
-	var linearInterpolator = new Interpolators.Linear_Class(0.7,0.9);
-	particlesFeature.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(linearInterpolator));
-/*
-	particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(
-         {r:0.5,g:0,b:0},{r:0,g:0,b:0.5}
-   ));*/
-	var white = { r: 1, g: 1, b: 1 };
-	var lightGrey = { r: 0.9, g: 0.9, b: 0.8 };
-	var blue = { r: 0, g: 0, b: 1 };
-	var red = { r: 0.7, g: 0, b: 0 }
-	particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(red, lightGrey));
+  var linearInterpolator = new Interpolators.Linear_Class(0.7, 0.9);
+  particlesFeature.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(linearInterpolator));
 
-	var rotating = new THREE.Object3D();
-	renderingEnvironment.addToScene(rotating);
-	renderingEnvironment.addToScene(particlesFeature.particleSystem);
+  var white = {
+    r: 1,
+    g: 1,
+    b: 1
+  };
+  var lightGrey = {
+    r: 0.9,
+    g: 0.9,
+    b: 0.8
+  };
+  var blue = {
+    r: 0,
+    g: 0,
+    b: 1
+  };
+  var red = {
+    r: 0.7,
+    g: 0,
+    b: 0
+  }
+  particlesFeature.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(red, lightGrey));
 
-	var clock = new THREE.Clock(true);
+  var rotating = new THREE.Object3D();
+  renderingEnvironment.addToScene(rotating);
+  renderingEnvironment.addToScene(particlesFeature.particleSystem);
+
+  var clock = new THREE.Clock(true);
 
 
 
@@ -174,13 +193,8 @@ function start() {
     name: 'car3'
   });
 
-  carGeometry.position.z = +0.25;
-  // attach the scene camera to car
-  //carGeometry.add(renderingEnvironment.camera) ;
-  /*renderingEnvironment.camera.position.x = 0.0 ;
-  renderingEnvironment.camera.position.z = 10.0 ;
-  renderingEnvironment.camera.position.y = -25.0 ;
-  renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;*/
+  carGeometry.position.z= +2 ;
+  carGeometry.add(particlesFeature.particleSystem);
 
   //	Skybox
   Loader.loadSkyBox('assets/maps', ['px', 'nx', 'py', 'ny', 'pz', 'nz'], 'jpg', renderingEnvironment.scene, 'sky', 4000);
@@ -267,6 +281,9 @@ function start() {
       });
     }
     if (currentlyPressedKeys[80]) { // (P) change camera
+      reset()
+    }
+    if (currentlyPressedKeys[80]) { // (P) change camera
       cameraManagement.switchCamera(args)
     }
     if (currentlyPressedKeys[68]) // (D) Right
@@ -311,16 +328,13 @@ function start() {
     renderingEnvironment.onWindowResize(window.innerWidth, window.innerHeight);
   }
 
-  var clock = new THREE.Clock();
+  function reset(){
+
+  }
 
   function render() {
     requestAnimationFrame(render);
     handleKeys();
-    // Vehicle stabilization
-    if (fixed) {
-      /*vehicle.goUp(vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0) ;
-  		vehicle.stopAngularSpeedsXY() ;*/
-    }
     vehicle.stabilizeSkid(50);
     vehicle.stabilizeTurn(1000);
     var oldPosition = vehicle.position.clone();
@@ -342,7 +356,8 @@ function start() {
     carRotationZ.rotation.z = vehicle.angles.z - Math.PI / 2.0;
 
     var deltaTime = clock.getDelta();
-	  particlesFeature.animate(deltaTime, renderingEnvironment);
+
+    particlesFeature.animate(deltaTime, renderingEnvironment);
 
     speedManagement.updateSpeed(oldPosition, newPosition);
     turnManagement.CheckpointPassed(NAV, carPosition)

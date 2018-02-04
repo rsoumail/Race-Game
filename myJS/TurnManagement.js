@@ -1,8 +1,8 @@
 TurnManagement = function() {
 
   this.lastActive = 0;
-
-  wrongDir = false;
+  this.finishedRace = false;
+  var wrongDir = false;
 
   this.dflt = {
     min: 0,
@@ -77,11 +77,13 @@ TurnManagement = function() {
 
   this.CheckpointPassed = function(NAV, carPosition) {
     var active = NAV.findActive(carPosition.position.x, carPosition.position.y);
-    if (this.lastActive > active) {
+    if (this.lastActive > parseInt(active)) {
       wrongDir = true;
     } else {
       wrongDir = false;
+      this.lastActive = parseInt(active)
     }
+
     var plane = NAV.planeSet[active];
     for (var c of this.turnCheckPoints) {
       if (c.plane === plane.name) {
@@ -102,50 +104,22 @@ TurnManagement = function() {
     return turnChecked
   }
 
+  this.resetCheckPoints = function (){
+    for (var c of this.turnCheckPoints) {
+      c.passed = false
+    }
+  }
+
   this.countTurn = function(NAV, carPosition) {
     if (this.switchTurn() === true && this.passedArrived(NAV, carPosition) === true) {
       var now = (new Date()).getTime();
       lapsTimes.push((now - startLapTime) / 1000);
       startLapTime = now;
       this.numberOfTurn++
-        if (this.numberOfTurn === this.turnMax) {
-
-        }
-<<<<<<< 69941c66e7c0893bfdd69451fa77e3870214c99b
-      })
-      return turnChecked
-   }
-
-   this.countTurn = function(NAV, carPosition){
-      if(this.switchTurn() === true && this.passedArrived(NAV, carPosition) === true){
-          this.numberOfTurn++
-          console.log('Turn '  + this.numberOfTurn)
-      this.turnCheckPoints.forEach((c) => {
-          c.passed = false
-       })
-     }
-     this.updateTurnCounter(this.numberOfTurn)
-   }
-
-   this.passedArrived = function(NAV, carPosition){
-     var passedArrived = false;
-     var active = NAV.findActive(carPosition.position.x, carPosition.position.y);
-     var plane = NAV.planeSet[active];
-     //console.log('logggg ' + plane.ymin)
-     if((plane.ymin) === 120){
-       passedArrived = true;
-     }
-     return passedArrived;
-   }
-
-   this.updateTurnCounter = function(turn){
-     //this.turnCounter.refresh(turn)
-   }
-=======
-
-      for (var c of this.turnCheckPoints) {
-        c.passed = false
+      if (this.numberOfTurn === this.turnMax) {
+        this.finishedRace = true;
       }
+      this.resetCheckPoints();
     }
   }
 
@@ -167,8 +141,22 @@ TurnManagement = function() {
     }
   }
 
-  this.cheksWrongDirection = function() {
+  this.resetCheckPoints = function (){
+    for (var c of this.turnCheckPoints) {
+      c.passed = false
+    }
+  }
 
+  this.reset = function() {
+    this.numberOfTurn = 0;
+    this.finishedRace = false;
+    this.turnCounter.refresh(this.numberOfTurn)
+    this.resetCheckPoints();
+    document.getElementById("lap1").innerHTML = "";
+    document.getElementById("lap2").innerHTML = "";
+    document.getElementById("lap3").innerHTML = "";
+    document.getElementById("elapsedTime").innerHTML = "";
+    document.getElementById("wrongtext").innerHTML = "";
   }
 
   setInterval(function() {
@@ -179,11 +167,12 @@ TurnManagement = function() {
       document.getElementById("lap" + (index + 1)).innerHTML = "Tour " + parseInt(index + 1) + " :" + lap
       index++
     }
-    if (wrongDir) {
+    if (wrongDir === true) {
       console.log("wrongDirection")
-      document.getElementById("wrongtext").innerHTML = "Mauvaise Direction"
+      document.getElementById("wrongtext").innerHTML = "Mauvaise Direction";
+    }
+    else {
+      document.getElementById("wrongtext").innerHTML = "";
     }
   }, 30);
-
->>>>>>> Implementation speed, turn, helico
 }

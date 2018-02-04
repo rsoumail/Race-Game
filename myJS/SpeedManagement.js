@@ -59,6 +59,12 @@ SpeedManagement = function() {
     return Math.sqrt(dx * dx + dy * dy /*+ dz * dz*/ );
   }
 
+  this.reset = function (){
+    var speed = 0;
+    var lastSpeed = 0;
+    $updateSpeedoMeter();
+  }
+
   setInterval(function() {
     $updateSpeedoMeter()
   }, 300);
