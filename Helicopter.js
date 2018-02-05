@@ -43,10 +43,12 @@ function Helicopter(configuration) {
   this.MAX_SPEED = 10; // px/frame
   this.acceleration = 0.5; // px.frame^-2
   this.frictionDeceleration = 0.1;
-  this.steps = 50;
+  this.CURVE_STEPS = 50;
+  this.TOTAL_STEPS = 2000;
+  this.MOVEMENT_STEP = 0.001;
   this.avancement = 0;
 
-  this.curves = {
+  this.data = {
     position: [],
     speed: [],
     acceleration: []
@@ -81,8 +83,8 @@ function Helicopter(configuration) {
     p[7]
   );
 
-  this.points1 = this.curve1.getPoints(50);
-  this.points2 = this.curve2.getPoints(50);
+  this.points1 = this.curve1.getPoints(this.CURVE_STEPS);
+  this.points2 = this.curve2.getPoints(this.CURVE_STEPS);
 
   var starsGeometry = new THREE.Geometry();
 
@@ -276,7 +278,7 @@ function Helicopter(configuration) {
 
 
 
-  this.cubicdt = function(p, t) {
+  this.bezierCubicdt = function(p, t) {
     var r = new THREE.Vector3(0, 0, 0);
     r.add(p[0].clone().multiplyScalar(-3 * t * t));
     r.add(p[1].clone().multiplyScalar(9 * t * t));
@@ -291,7 +293,7 @@ function Helicopter(configuration) {
   };
 
 
-  this.cubicdt2 = function(p, t) {
+  this.bezierCubicdt2 = function(p, t) {
     var r = new THREE.Vector3(0, 0, 0);
     r.add(p[0].clone().multiplyScalar(-6 * t));
     r.add(p[1].clone().multiplyScalar(18 * t));
@@ -303,13 +305,78 @@ function Helicopter(configuration) {
     return r;
   };
 
-  this.interpolate = function(curve, n, p) {
+  this.interpolate = function(bezierF, n, p) {
     var r = [];
-    for (var i = 0; i < n; i++) {
-      r.push(curve(p, (i / n)));
+    for (var i = 0; i < n; i+=this.MOVEMENT_STEP) {
+      r.push(bezierF(p, (i / n)));
     }
     return r;
   }
+
+  this.sumDatas = function(datas, curves, index) {
+    var temp = 0;
+    var data;
+    switch(index){
+      case 0:
+        data = datas.position;
+        break;
+      case 1:
+        data = datas.speed;
+        break;
+      case 2:
+        data = datas.acceleration;
+        break;
+    }
+    if(index === 0){
+      while (temp <= 1) {
+        data.push(curves[0].getPointAt(temp))
+        temp += this.MOVEMENT_STEP;
+      }
+      temp = 0
+      while (temp <= 1) {
+        data.push(curves[1].getPointAt(temp))
+        temp += this.MOVEMENT_STEP;
+      }
+      return data;
+    }
+    else {
+      var i = 0;
+      for(var d of curves[0]){
+        data.push(curves[0][i]);
+          i++;
+      }
+      i = 0;
+      for(var d of curves[1]){
+        data.push(curves[1][i]);
+          i++;
+      }
+      return data;
+    }
+
+  }
+
+  /* concate all bezier curves */
+
+  this.data.position = this.sumDatas(this.data, [this.curve1, this.curve2], 0);
+
+
+  /* creates speeds with interpolator */
+
+  this.speeds1 = this.interpolate(this.bezierCubicdt, this.TOTAL_STEPS, [p[0], p[1], p[2], p[3]]);
+  this.speeds2 = this.interpolate(this.bezierCubicdt, this.TOTAL_STEPS, [p[4], p[5], p[6], p[7]]);
+
+  /* concat all speeds */
+
+  this.data.speed = this.sumDatas(this.data, [this.speeds1, this.speeds2], 1);
+
+  /* creates accelerations with interpolator */
+
+  this.accelerations1 = this.interpolate(this.bezierCubicdt2, this.TOTAL_STEPS, [p[0], p[1], p[2], p[3]]);
+  this.accelerations2 = this.interpolate(this.bezierCubicdt2, this.TOTAL_STEPS, [p[4], p[5], p[6], p[6]]);
+
+  /* concat all accelerations */
+
+  this.data.acceleration = this.sumDatas(this.data, [this.accelerations1, this.accelerations2], 2);
 
   this.turnPales = function() {
 
@@ -375,6 +442,20 @@ function Helicopter(configuration) {
     this.position.position.x -= this.speed * Math.sin(this.position.rotation.z);
   }
 
+  this.handleBezierSpeed = function (){
+    var next;
+    if (this.avancement === 1999) {
+      next = 0;
+    } else {
+      next = this.avancement + 1;
+    }
+    this.setSpeed(
+      this.data.speed[this.avancement].angleTo(new THREE.Vector3(this.data.speed[next].x, this.data.speed[next].y, this.data.speed[next].z)) +
+      this.data.acceleration[this.avancement].angleTo(new THREE.Vector3(this.data.acceleration[next].x, this.data.acceleration[next].y, this.data.acceleration[next].z)) -
+      this.frictionDeceleration
+   );
+  }
+
 
   this.handleRotation = function() {
 
@@ -408,10 +489,6 @@ function Helicopter(configuration) {
     this.position.rotation.z = corpRotation;
   }
 
-  this.bezierRotation = function() {
-
-  }
-
   this.getCurveObject = function() {
     return this.curveObject;
   }
@@ -419,6 +496,7 @@ function Helicopter(configuration) {
 
 
   this.makeRotation = function() {
+
     var speed;
     var angle;
     var next;
@@ -427,8 +505,9 @@ function Helicopter(configuration) {
     } else {
       next = this.avancement + 1;
     }
-    speed = this.curves.position[this.avancement];
-    angle = (speed.angleTo(new THREE.Vector3(this.curves.position[next].x, this.curves.position[next].y, this.curves.position[next].z)));
+  //  this.palesSpeed += this.data.speed[this.avancement].angleTo(new THREE.Vector3(this.data.speed[next].x, this.data.speed[next].y, this.data.speed[next].z));
+    speed = this.data.position[this.avancement];
+    angle = (speed.angleTo(new THREE.Vector3(this.data.position[next].x, this.data.position[next].y, this.data.position[next].z)));
     if (this.avancement === 1999)
       this.position.rotation.z = 0
 
@@ -443,32 +522,18 @@ function Helicopter(configuration) {
   }
 
   this.update = function() {
-    this.handleSpeed();
+    //this.handleSpeed();
+    this.handleBezierSpeed();
     this.turnPales();
-    this.position.position.x = this.curves.position[this.avancement].x;
-    this.position.position.y = this.curves.position[this.avancement].y;
-    this.position.position.z = this.curves.position[this.avancement].z;
+    this.position.position.x = this.data.position[this.avancement].x;
+    this.position.position.y = this.data.position[this.avancement].y;
+    this.position.position.z = this.data.position[this.avancement].z;
     this.makeRotation();
-    if ((this.avancement + 1) === 2000) {
-      this.tour++
-    }
-    this.avancement = (this.avancement + 1) % 2000;
+    this.avancement = (this.avancement + 1) % this.TOTAL_STEPS;
 
     //this.handleRotation();
   }
 
-  this.createBezier = function() {
-    var temp = 0;
-    while (temp <= 1) {
-      this.curves.position.push(this.curve1.getPointAt(temp))
-      temp += 0.001
-    }
-    temp = 0
-    while (temp <= 1) {
-      this.curves.position.push(this.curve2.getPointAt(temp))
-      temp += 0.001
-    }
-  }
 
   this.reset = function (){
     this.position.position.x = configuration.position.x;
@@ -478,8 +543,6 @@ function Helicopter(configuration) {
     this.avancement = 0;
 
   }
-  this.createBezier()
-
 
   return this;
 }
