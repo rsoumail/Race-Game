@@ -1,5 +1,15 @@
-# m2il_mar_course
-Jeu de course développé avec la librairie freeJS
 
-À remplacer dans le fichier ParticleSystem.js pour le système à particules : 
-ModulesLoader.requireModules(['threejs/three.min.js', 'Physics.js', 'myJS/ThreeRenderingEnv.js', 'MathExt.js', 'DebugHelper.js']) ;
+# Race Game
+
+A race game on web browser written in JS with TreeJS
+
+## Requirements
+- Firefox as web browser
+
+## Usage
+- On the project's root open marace10.3.html file with firefox
+  
+## Resources
+
+- Javascript 
+- TreeJS
